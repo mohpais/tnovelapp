@@ -1,22 +1,31 @@
 import { defineStore } from "pinia";
 import helpers from '@/global/helpers';
+import Rest from "@/global/rest"; // Import from Global Packages
+const rest = new Rest().Api(); // Creating a Rest instance
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
         authenticated: false,
-        authUser: null
+        authUser: null,
+        roleUser: null
     }),
     getters: {
         user: (state) => state.authUser
     },
     actions: {
         async checkLogin() {
-            const _xa = sessionStorage.getItem("_xa");
-            const _us = sessionStorage.getItem("_us");
-            if (_xa) {
-                const user = JSON.parse(helpers.dec(_us, 1, 6));
-                this.authUser = user;
-                this.authenticated = true;
+            const token = sessionStorage.getItem("_xa");
+            const _user = sessionStorage.getItem("_us");
+            const _role = sessionStorage.getItem("_rl");
+            if (token && _user && _role) {
+                const user = JSON.parse(helpers.dec(_user, 1, 6));
+                const role = JSON.parse(helpers.dec(_role, 1, 6));
+
+                if (user && role) {
+                    this.authUser = user;
+                    this.roleUser = role;
+                    this.authenticated = true;
+                }
             }
         },
         
@@ -34,7 +43,9 @@ export const useAuthStore = defineStore("auth", {
         logout() {
             sessionStorage.removeItem("_xa");
             sessionStorage.removeItem("_us");
+            sessionStorage.removeItem("_rl");
             this.authUser = null;
+            this.roleUser = null;
             this.authenticated = false;
         }
     }

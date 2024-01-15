@@ -1,13 +1,19 @@
 // import Cookies from 'js-cookie'
 import { useAuthStore } from "@/stores";
+import helpers from '@/global/helpers';
 
 async function requireLogin(to, from, next) {
     const authStore = useAuthStore();
     await authStore.checkLogin();
-    let authenticated;
+    let authenticated, roles;
+    roles = authStore.roleUser;
     authenticated = !!authStore.authenticated;
     if (authenticated) {
-        next()
+        if (to.meta.roles && !helpers.isSubArray(to.meta.roles, roles)) {
+            next('/forbidden');
+        } else {
+            next()
+        }
     } else {
         next({ name: "SignIn" })
     }
@@ -16,13 +22,17 @@ async function requireLogin(to, from, next) {
 async function isLogin(to, from, next) {
     const authStore = useAuthStore();
     await authStore.checkLogin();
-    let authenticated;
+    let authenticated, roles;
     authenticated = !!authStore.authenticated;
-
+    roles = authStore.roleUser;
     if (authenticated) {
-        next({ name: "Dashboard" })
+        if (helpers.isSubArray(['super-admin', 'admin-base', 'admin-content'], roles)) {
+            next({ name: "Dashboard" });
+        } else {
+            next({ name: "Main" });
+        }
     } else {
-        next()
+        next();
     }
 }
 
@@ -53,6 +63,13 @@ export default [
                 path: "/detail/:slug",
                 name: "Detail",
                 component: () => import('@/views/Detail.vue'),
+            },
+            {
+                path: "/premium",
+                name: "Premium",
+                meta: { roles: ['premium-user'] },
+                beforeEnter: requireLogin,
+                component: () => import('@/views/Premium.vue'),
             }
         ]
     },
@@ -74,7 +91,7 @@ export default [
         path: "/panel",
         name: "Panel",
         redirect: { name: "Dashboard" },
-        meta: { layout: "logged-layout" },
+        meta: { layout: "logged-layout", roles: ['super-admin', 'admin-base', 'admin-content'] },
         beforeEnter: requireLogin,
         children: [
             {

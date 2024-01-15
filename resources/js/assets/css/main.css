@@ -367,7 +367,7 @@ ol {
 	color: #ffffff;
 }
 
-.header__menu ul li:hover a {
+.header__menu ul li:hover a:not(.dropdown-item) {
 	color: #ffffff;
 }
 
@@ -413,7 +413,7 @@ ol {
 	padding: 5px 20px;
 }
 
-.header__menu ul li a {
+.header__menu ul li a:not(.dropdown-item) {
 	font-size: 15px;
 	color: #b7b7b7;
 	display: block;
@@ -422,6 +422,10 @@ ol {
 	-o-transition: all, 0.5s;
 	transition: all, 0.5s;
 	padding: 20px;
+}
+
+.header__menu ul li a:focus {
+	color: #b7b7b7;
 }
 
 .header__menu ul li a span {
@@ -438,7 +442,7 @@ ol {
 .header__right a {
 	display: inline-block;
 	font-size: 18px;
-	color: #ffffff;
+	/* color: #ffffff; */
 	margin-right: 30px;
 }
 

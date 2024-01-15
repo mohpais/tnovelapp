@@ -13,10 +13,36 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::create([
-            'name' => 'Super Admin',
-            'created_by' => 'System',
-            'updated_by' => 'System'
-        ]);
+        $roleData = [
+            [
+                'name' => 'super-admin',
+                'created_by' => 'System',
+                'updated_by' => 'System'
+            ],
+            [
+                'name' => 'admin-content',
+                'created_by' => 'System',
+                'updated_by' => 'System'
+            ],
+            [
+                'name' => 'admin-user',
+                'created_by' => 'System',
+                'updated_by' => 'System'
+            ],
+            [
+                'name' => 'premium-user',
+                'created_by' => 'System',
+                'updated_by' => 'System'
+            ],
+            [
+                'name' => 'ordinary-user',
+                'created_by' => 'System',
+                'updated_by' => 'System'
+            ]
+        ];
+
+        foreach ($roleData as $role) {
+            Role::create($role);
+        }
     }
 }

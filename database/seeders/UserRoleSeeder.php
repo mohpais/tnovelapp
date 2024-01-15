@@ -15,10 +15,28 @@ class UserRoleSeeder extends Seeder
      */
     public function run(): void
     {
-       // Attach roles to users
-       $admin = User::where('username', 'superadmin')->first();
-       $adminRole = Role::where('name', 'Super Admin')->first();
+       // Attach superadmin to users
+       $superadminuser = User::where('username', 'superadmin')->first();
+       $superadminrole = Role::where('name', 'super-admin')->first();
 
-       $admin->roles()->attach($adminRole->id);
+       $superadminuser->roles()->attach($superadminrole->id);
+
+       // Attach admin content to users
+       $admincontentuser = User::where('username', 'riyanii19')->first();
+       $admincontentrole = Role::where('name', 'admin-content')->first();
+
+       $admincontentuser->roles()->attach($admincontentrole->id);
+
+       // Attach admin content to users
+       $premiumuser = User::where('username', 'liusipin')->first();
+       $premiumrole = Role::where('name', 'premium-user')->first();
+
+       $premiumuser->roles()->attach($premiumrole->id);
+
+       // Attach admin content to users 
+       $ordinaryuser = User::where('username', 'julian.valen')->first();
+       $ordinaryrole = Role::where('name', 'ordinary-user')->first();
+
+       $ordinaryuser->roles()->attach($ordinaryrole->id);
     }
 }

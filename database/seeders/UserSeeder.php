@@ -14,11 +14,35 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::create([
-            'fullname' => 'Moh Pais',
-            'username' => 'superadmin',
-            'email' => 'super.admin@tnovelapp.com',
-            'password' => Hash::make('TNovelApp@2024')
-        ]);
+        $userData = [
+            [
+                'fullname' => 'Mohamad Pais',
+                'username' => 'superadmin',
+                'email' => 'super.admin@tnovelapp.com',
+                'password' => Hash::make('TNovelApp@2024')
+            ],
+            [
+                'fullname' => 'Ani Riyani',
+                'username' => 'riyanii19',
+                'email' => 'aniriyanii19@tnovelapp.com',
+                'password' => Hash::make('test123')
+            ],
+            [
+                'fullname' => 'Devin Liu',
+                'username' => 'liusipin',
+                'email' => 'devin@londonsumatra.com',
+                'password' => Hash::make('test123')
+            ],
+            [
+                'fullname' => 'Julian Valention',
+                'username' => 'julian.valen',
+                'email' => 'julian.valen@londonsumatra.com',
+                'password' => Hash::make('test123')
+            ]
+        ];
+
+        foreach ($userData as $user) {
+            User::create($user);
+        }
     }
 }

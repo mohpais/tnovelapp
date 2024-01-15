@@ -84,16 +84,18 @@
             .then(function successCallBack(response) {
                 var data = response.data;
                 if (data.success) {
-                    var authorization = data.authorization;
+                    var authorization = data.token;
                     var user = data.user;
-                    sessionStorage.setItem("_xa", authorization.token);
+                    var role = data.role;
+                    sessionStorage.setItem("_xa", authorization);
                     sessionStorage.setItem("_us", helpers.enc(JSON.stringify(user), 1, 6));
+                    sessionStorage.setItem("_rl", helpers.enc(JSON.stringify(role), 1, 6));
                     window.location.reload();
                 }
             })
             .catch(function errorCallBack(err) {
                 console.log(err);
-                helpers.alertToast("Something wrong when login!");
+                helpers.alertToast("error", "Something wrong when login!");
             });
 
         isLoading.value = false;

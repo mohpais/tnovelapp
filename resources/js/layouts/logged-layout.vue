@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <!-- Sidebar Page -->
-        <SidebarPanel :authenticatedUser="authStore.authUser" :isCollapsed="settingPanelStore.isCollapsed" />
+        <SidebarPanel :authenticatedUser="authStore.authUser" :authenticatedRole="authStore.roleUser" :isCollapsed="settingPanelStore.isCollapsed" />
         <div class="main">
             <!-- Header Page -->
             <NavbarPanel @handleSidebar="handleSidebar(!settingPanelStore.isCollapsed)" @handleLogout="handleLogout" />

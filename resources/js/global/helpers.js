@@ -731,6 +731,25 @@ let helpers = {
     }
   
     return arr.sort(compare);
+  },
+
+  isSubArray: (mainArray, subArray) => {
+    for (let i = 0; i < mainArray.length - subArray.length + 1; i++) {
+      let isMatch = true;
+  
+      for (let j = 0; j < subArray.length; j++) {
+        if (mainArray[i + j] !== subArray[j]) {
+          isMatch = false;
+          break;
+        }
+      }
+  
+      if (isMatch) {
+        return true;
+      }
+    }
+  
+    return false;
   }
 };
 

@@ -11,7 +11,7 @@
                             <div class="simplebar-content">
                                 <a class="sidebar-brand" href="/">
                                     <span class="sidebar-brand-text align-middle">
-                                        Hidayah App
+                                        TNovel App
                                     </span>
                                     <svg class="sidebar-brand-icon align-middle" width="32px" height="32px" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="square" stroke-linejoin="miter" color="#FFFFFF" style="margin-left: -3px">
                                         <path d="M12 4L20 8.00004L12 12L4 8.00004L12 4Z"></path>
@@ -26,7 +26,7 @@
                                         </div>
                                         <div class="flex-grow-1 ps-2">
                                             <a class="sidebar-user-title dropdown-toggle" href="#" data-bs-toggle="dropdown">
-                                                {{ authenticatedUser.name }}
+                                                {{ authenticatedUser.fullname }}
                                             </a>
                                             <div class="dropdown-menu dropdown-menu-start">
                                                 <a class="dropdown-item" href="/pages-profile"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user align-middle me-1"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg> Profile</a>
@@ -39,7 +39,7 @@
                                                 <a class="dropdown-item" href="#">Log out</a>
                                             </div>
 
-                                            <div class="sidebar-user-subtitle">Application Developer</div>
+                                            <div class="sidebar-user-subtitle">{{ state.currentRole }}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -260,7 +260,7 @@
 
 <script setup>
     /** Import package */
-    import { onMounted } from 'vue';
+    import { onMounted, reactive } from 'vue';
     import { useRoute } from 'vue-router';
 
     /** Import image */
@@ -275,11 +275,18 @@
         authenticatedUser: {
             type: Object,
             default: null
+        },
+        authenticatedRole: {
+            type: Array,
+            default: null
         }
     });
 
     /**  Define variables */
     const route = useRoute();
+    let state = reactive({
+        currentRole: ''
+    })
 
     /** Define method */
     const isActive = (routePath, params) => {
@@ -300,6 +307,10 @@
 
     onMounted(() => {
         const currentPath = route.path;
-        console.log(currentPath);
+        if (props.authenticatedRole.length > 0) {
+            let role = props.authenticatedRole[0];
+            state.currentRole = role.replace(/\b\w/g, (match) => match.toUpperCase()).replace(/-/g, ' ');
+        }
+        
     })
 </script>
