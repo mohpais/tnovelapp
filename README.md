@@ -63,9 +63,9 @@ By amalgamating technology with religious guidance, the app strives to empower i
 - <b>Database Management:</b> Utilizing 
 **[MySQL](https://www.mysql.com/)**
 
-# Setup Environment
+# Steps to prepare the project
 
-1. Clone project on Github [Hidayah Website](https://github.com/mohpais/hidayah-website) using this command
+1. Clone project on Github [TNovel App](https://github.com/mohpais/hidayah-website)
 ```
 git clone https://github.com/mohpais/hidayah-website
 ```
@@ -73,7 +73,20 @@ git clone https://github.com/mohpais/hidayah-website
 ```
 cp .env.exampe .env
 ```
-3. Connect Database by updating .env like this:
+3. Install package for laravel 
+```
+composer install
+composer dump-autoload
+```
+4. Generate new key
+```
+php artisan key:generate
+```
+5. Install package for frontend [Vue.Js](https://vuejs.org/) 
+```
+npm install
+```
+6. Connect Database by updating .env like this:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -82,15 +95,15 @@ DB_DATABASE=YOUR_DB_NAME
 DB_USERNAME=YOUR_DB_USERNAME
 DB_PASSWORD=YOUR_DB_PASSWORD
 ```
-4. Migrate the database using this command:
+7. Migrate the database using this command:
 ```
 php artisan migrate
 ```
-5. Then generate JWT secret key like:
+8. Then generate JWT secret key like:
 ```
 php artisan jwt:secret
 ```
-6. Running 
+9. Running 
 ```
 php artisan serve
 ```
