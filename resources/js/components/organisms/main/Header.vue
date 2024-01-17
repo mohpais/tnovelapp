@@ -9,19 +9,9 @@
                 </div>
                 <div class="col-8">
                     <div class="header__nav row my-auto">
-                        <nav class="header__menu ">
+                        <nav class="header__menu">
                             <ul>
-                                <li><a href="./index.html">Home</a></li>
-                                <!-- <li><a href="">Categories <i class="bi bi-chevron-down"></i></a>
-                                    <ul class="dropdown">
-                                        <li><a href="./categories.html">Categories</a></li>
-                                        <li><a href="./anime-details.html">Anime Details</a></li>
-                                        <li><a href="./anime-watching.html">Anime Watching</a></li>
-                                        <li><a href="./blog-details.html">Blog Details</a></li>
-                                        <li><a href="./signup.html">Sign Up</a></li>
-                                        <li><a href="./login.html">Login</a></li>
-                                    </ul>
-                                </li> -->
+                                <li><router-link to="/">Home</router-link></li>
                                 <li class="dropdown">
                                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         Categories

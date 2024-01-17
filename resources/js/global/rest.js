@@ -1,5 +1,7 @@
+/** Import package */
 import axios from "axios";
-import Helpers from "./helpers";
+/** Import global */
+import helpers from "./helpers";
 
 class Rest {
   constructor(_url) {
@@ -36,10 +38,59 @@ class Rest {
               return e;
             }
           }
+
+          // Set the flag to indicate that refreshing is in progress
+          this.isRefreshing = true;
+
+          // Refresh the token using your authentication logic
+          return await this._refreshToken()
+            .then((newToken) => {
+              // Update the original request with the new token
+              originalRequest.headers['Authorization'] = 'Bearer ' + newToken;
+    
+              // Resolve all the enqueued requests
+              refreshSubscribers.forEach((callback) => callback(newToken));
+              refreshSubscribers = [];
+    
+              return this.http(originalRequest);
+            })
+            .catch((refreshError) => {
+              // Handle token refresh error
+              console.error('Token refresh failed:', refreshError);
+              // You might want to redirect the user to the login page or handle the error appropriately
+              sessionStorage.removeItem("_xa");
+              sessionStorage.removeItem("_us");
+              sessionStorage.removeItem("_rl");
+              window.location.reload();
+    
+              return Promise.reject(refreshError);
+            })
+            .finally(() => {
+              isRefreshing = false;
+            });
         }
         return Promise.reject(error);
       }
     );
+  }
+
+
+  async _refreshToken() {
+    try {
+      const response = await this.http.get('auth/refresh');
+      // Assume the new token is returned in the response data
+      const newToken = response.data.authorisation.token;
+
+      // Update the current user's token in your authentication system (if applicable)
+      if (sessionStorage.getItem('_xa')) {
+        sessionStorage.setItem('_xa', newToken);
+      }
+      return await Promise.resolve(newToken);
+    } catch (refreshError) {
+      // Handle token refresh error
+      console.error('Token refresh failed:', refreshError);
+      return await Promise.reject(refreshError);
+    }
   }
 
   // Helper method: add additional key-value to an object
@@ -55,8 +106,10 @@ class Rest {
 
     const x = this._tokenValue || sessionStorage.getItem(this._XTOKEN);
     if (x) {
-      const auth = JSON.parse(Helpers.dec(x, 1, 6));
-      headers["Authorization"] = `Bearer ${auth.Token}`;
+      // let dec = helpers.dec(x, 1, 6);
+      // const auth = JSON.parse(helpers.dec(x, 1, 6));
+      // headers["Authorization"] = `Bearer ${auth.Token}`;
+      headers["Authorization"] = `Bearer ${x}`;
     }
 
     return onlyHeader ? headers : { headers: headers };

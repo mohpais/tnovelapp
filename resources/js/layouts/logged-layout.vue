@@ -54,8 +54,10 @@
 
     // Load settings from local storage when the app starts
     onMounted(() => {
-        helpers.alertToast('success', "Login success!");
-        // console.log(authStore.authUser);
+        if (!authStore.welcomePopup) {
+            helpers.alertToast('success', "Login success!");
+            authStore.setWelcomePopup();
+        }
         if (import.meta.env.VITE_APP_ENV === 'local') {
             settingPanelStore.loadSettingsFromLocalStorage();
         }

@@ -22,7 +22,6 @@ return new class extends Migration
             $table->text('address')->nullable();
             $table->string('photo_profile')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->timestamp('regitered_at')->nullable();
             $table->timestamp('last_login')->nullable();
             $table->string('password');
             $table->boolean('status')->default(true);

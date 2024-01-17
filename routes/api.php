@@ -21,7 +21,7 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::post('/refresh', [AuthController::class, 'refresh']);
+    Route::get('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'me']);    
 });
 
@@ -29,5 +29,6 @@ Route::group([
     'prefix' => 'user'
 ], function ($router) {
     Route::get('/list', [UserController::class, 'index']);  
+    Route::post('/list-datatables', [UserController::class, 'list']);  
 });
 

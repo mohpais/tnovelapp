@@ -7,7 +7,8 @@ export const useAuthStore = defineStore("auth", {
     state: () => ({
         authenticated: false,
         authUser: null,
-        roleUser: null
+        roleUser: null,
+        welcomePopup: false
     }),
     getters: {
         user: (state) => state.authUser
@@ -28,7 +29,9 @@ export const useAuthStore = defineStore("auth", {
                 }
             }
         },
-        
+        setWelcomePopup() {
+            this.welcomePopup = true;
+        },
         async getProfile() {
             try {
                 const response = await rest.get('auth/me');
@@ -38,6 +41,11 @@ export const useAuthStore = defineStore("auth", {
             } catch (error) {
                 this.authUser = null
                 this.authenticated = false
+            }
+        },
+        refreshToken(new_token) {
+            if (sessionStorage.getItem('_xa')) {
+                sessionStorage.setItem('_xa', new_token);
             }
         },
         logout() {
