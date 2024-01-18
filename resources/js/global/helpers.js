@@ -577,7 +577,20 @@ let helpers = {
     };
     return createToast(t(msg), opt);
   },
+  confirmDeleteAction: async (msg) => {
+    // Use SweetAlert2 for confirmation dialog
+    const result = await Swal.fire({
+      title: 'Confirmation',
+      text: msg ?? 'Are you sure you want to delete this item?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    });
 
+    return result.isConfirmed;
+  },
   alertToast: (type, msg) => {
     const Toast = Swal.mixin({
       toast: true,

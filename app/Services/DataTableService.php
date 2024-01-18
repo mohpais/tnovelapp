@@ -29,7 +29,8 @@ class DataTableService
         $data = $query->paginate($perPage, ['*'], 'page', $currentPage);
 
         // Extract the columns from the payload
-        $requestedColumns = collect($request->input('columns'))->pluck('data')->toArray();
+        // $requestedColumns = collect($request->input('columns'))->pluck('data')->toArray();
+        $requestedColumns = $request->input('columns');
 
         // Filter the data to keep only the requested columns
         $filteredData = $data->map(function ($item) use ($requestedColumns) {
@@ -92,7 +93,7 @@ class DataTableService
                     $searchValue = $searchCondition['value'];
     
                     if ($columnIndex >= 0 && $columnIndex < count($request->input('columns'))) {
-                        $column = $request->input('columns')[$columnIndex]['data'];
+                        $column = $request->input('columns')[$columnIndex];
     
                         // Apply the search condition to the specified column
                         $query->orWhere($column, 'like', '%' . $searchValue . '%');
@@ -109,7 +110,7 @@ class DataTableService
 
             foreach ($orders as $order) {
                 $orderColumnIndex = $order['column'];
-                $orderColumn = $request->input('columns')[$orderColumnIndex]['data'];
+                $orderColumn = $request->input('columns')[$orderColumnIndex];
                 $orderDirection = $order['dir'];
 
                 $query->orderBy($orderColumn, $orderDirection);
