@@ -1,5 +1,4 @@
 <template>
-    {{ currentPage }} - {{ lastPage }}
     <nav>
         <ul class="pagination">
             <li class="page-item" :class="{ 'disabled': currentPage === 1 }">

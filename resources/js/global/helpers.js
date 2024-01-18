@@ -754,6 +754,19 @@ let helpers = {
 
   toTitleCase: (str) => {
     return str.replace(/_/g, ' ').replace(/\b\w/g, firstLetter => firstLetter.toUpperCase());
+  },
+
+  // Function to check if an object in the array has a specific property
+  hasProperty: (array, propertyName) => {
+    // Using Array.some() to check if at least one object in the array has the property
+    return array.some(obj => obj.hasOwnProperty(propertyName));
+  },
+  // Function to filter objects and include specific properties
+  filterObjectsByProperty: (array, propertyName, additionalProperty) => {
+    // Using Array.filter() to create a new array with modified objects
+    return array
+      .filter(obj => obj.hasOwnProperty(propertyName))
+      .map(obj => ({ [propertyName]: obj[propertyName], status: additionalProperty }));
   }
 };
 

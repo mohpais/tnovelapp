@@ -23,14 +23,23 @@ class DataTableService
         $this->applyOrdering($query, $request);
 
         // Apply pagination
-        $perPage = $request->input('length', 10);
-        $currentPage = ceil($request->input('page') - 1 / $perPage) + 1;
+        $perPage = $request->input('displayLength', 10);
+        $currentPage = ($request->input('page') - 1) / $perPage + 1;
 
         $data = $query->paginate($perPage, ['*'], 'page', $currentPage);
+
+        // Extract the columns from the payload
+        $requestedColumns = collect($request->input('columns'))->pluck('data')->toArray();
+
+        // Filter the data to keep only the requested columns
+        $filteredData = $data->map(function ($item) use ($requestedColumns) {
+            return collect($item)->only($requestedColumns)->toArray();
+        });
+
         return [
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $totalFiltered,
-            'data' => $data->items(),
+            'data' => $filteredData->toArray(),
             'pagination' => [
                 'currentPage' => $data->currentPage(),
                 'perPage' => $data->perPage(),
@@ -38,39 +47,76 @@ class DataTableService
                 'total' => $data->total(),
             ],
         ];
+
+        // return [
+        //     'recordsTotal' => $totalRecords,
+        //     'recordsFiltered' => $totalFiltered,
+        //     'data' => $data->items(),
+        //     'pagination' => [
+        //         'currentPage' => $data->currentPage(),
+        //         'perPage' => $data->perPage(),
+        //         'lastPage' => $data->lastPage(),
+        //         'total' => $data->total(),
+        //     ],
+        // ];
     }
 
     protected function applySearch(Builder $query, Request $request)
     {
-        if ($request->has('columns')) {
-            $columns = $request->input('columns');
+        // if ($request->has('columns')) {
+        //     $columns = $request->input('columns');
     
-            // Loop through each column in the payload
-            foreach ($columns as $column) {
-                if ($column['searchable'] && isset($column['search']['value']) && $column['search']['value'] !== '') {
-                    $searchValue = $column['search']['value'];
+        //     // Loop through each column in the payload
+        //     foreach ($columns as $column) {
+        //         if (isset($column['searchable']) && !$column['searchable']) continue;
+
+        //         if (isset($column['search']['value']) && $column['search']['value'] !== '') {
+        //             $searchValue = $column['search']['value'];
     
-                    // Apply the search condition to the specified column
-                    $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
+        //             // Apply the search condition to the specified column
+        //             $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
+        //             // // Use where instead of orWhere for the first condition
+        //             // $query->where(function ($query) use ($column, $searchValue) {
+        //             //     $query->where($column['data'], 'like', '%' . $searchValue . '%');
+        //             // });
+        //         }
+        //     }
+        // }
+        if ($request->has('search')) {
+            $searchConditions = $request->input('search');
+            if (is_string($request->has('search'))) {
+                $column = $request->input('columns');
+            } else {
+                foreach ($searchConditions as $searchCondition) {
+                    $columnIndex = $searchCondition['column']; // Adjust to zero-based index
+                    $searchValue = $searchCondition['value'];
+    
+                    if ($columnIndex >= 0 && $columnIndex < count($request->input('columns'))) {
+                        $column = $request->input('columns')[$columnIndex]['data'];
+    
+                        // Apply the search condition to the specified column
+                        $query->orWhere($column, 'like', '%' . $searchValue . '%');
+                    }
                 }
             }
         }
-        // if ($request->has('search') && $request->input('search.value')) {
-        //     $searchValue = $request->input('search.value');
-        //     $query->where(function ($q) use ($searchValue) {
-        //         $q->where('name', 'like', '%' . $searchValue . '%')
-        //           ->orWhere('email', 'like', '%' . $searchValue . '%');
-        //         // Add more fields as needed
-        //     });
-        // }
     }
 
     protected function applyOrdering(Builder $query, Request $request)
     {
-        if ($request->has('order')) {
-            $orderColumn = $request->input('columns')[$request->input('order.0.column')]['data'];
-            $orderDirection = $request->input('order.0.dir');
-            $query->orderBy($orderColumn, $orderDirection);
+        if ($request->has('orders')) {
+            $orders = $request->input('orders');
+
+            foreach ($orders as $order) {
+                $orderColumnIndex = $order['column'];
+                $orderColumn = $request->input('columns')[$orderColumnIndex]['data'];
+                $orderDirection = $order['dir'];
+
+                $query->orderBy($orderColumn, $orderDirection);
+            }
+            // $orderColumn = $request->input('columns')[$request->input('orders.0.column')]['data'];
+            // $orderDirection = $request->input('orders.0.dir');
+            // $query->orderBy($orderColumn, $orderDirection);
         }
     }
 }

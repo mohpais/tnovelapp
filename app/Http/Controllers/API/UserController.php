@@ -41,11 +41,55 @@ class UserController extends Controller
     public function list(Request $request)
     {
         $query = User::query();
-
+        // dd($query);
         // Use the DataTableService or any other logic as needed
         $response = $this->dataTableService->getJsonResponse($query, $request);
-
+        // if ($request->has('columns')) {
+        //     $columns = $request->input('columns');
+    
+        //     // Loop through each column in the payload
+        //     foreach ($columns as $column) {
+        //         if (isset($column['searchable']) && !$column['searchable']) continue;
+                
+        //         if (isset($column['search']['value']) && $column['search']['value'] !== '') {
+        //             $searchValue = $column['search']['value'];
+                    
+        //             // Apply the search condition to the specified column
+        //             // $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
+        //             // Use where instead of orWhere for the first condition
+        //             $query->where(function ($query) use ($column, $searchValue) {
+        //                 $query->where($column['data'], 'like', '%' . $searchValue . '%');
+        //             });
+        //         }
+        //     }
+        // }
         return response()->json($response, 200);
+    }
+
+    public function applySearch(Builder $query, Request $request)
+    {
+        if ($request->has('columns')) {
+            $columns = $request->input('columns');
+    
+            // Loop through each column in the payload
+            foreach ($columns as $column) {
+                if (isset($column['searchable']) && !$column['searchable']) continue;
+                
+                if (isset($column['search']['value']) && $column['search']['value'] !== '') {
+                    $searchValue = $column['search']['value'];
+    
+                    // Apply the search condition to the specified column
+                    // $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
+                    // Use where instead of orWhere for the first condition
+                    $query->where(function ($query) use ($column, $searchValue) {
+                        $query->where($column['data'], 'like', '%' . $searchValue . '%');
+                    });
+                }
+            }
+        }
+
+        // Return the modified query
+        return $query;
     }
 
     /**
