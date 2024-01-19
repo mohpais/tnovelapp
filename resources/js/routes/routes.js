@@ -109,14 +109,34 @@ export default [
             {
                 path: "/panel/users",
                 name: "User",
-                component: () => import('@/views/_panels/User.vue'),
-                meta: {
-                    title: "User",
-                    breadcrumbs: [
-                        { name: `Home`, link: `` },
-                        { name: "User", link: "/panel/users" },
-                    ],
-                },
+                redirect: { name: "UserList" },
+                children: [
+                    {
+                        path: "/panel/users/",
+                        name: "UserList",
+                        component: () => import('@/views/_panels/User.vue'),
+                        meta: {
+                            title: "User List",
+                            breadcrumbs: [
+                                { name: `Home`, link: `` },
+                                { name: "User", link: "/panel/users" },
+                            ],
+                        },
+                    },
+                    {
+                        path: "/panel/users/add",
+                        name: "UserAdd",
+                        component: () => import('@/views/_panels/UserAdd.vue'),
+                        meta: {
+                            title: "User Add",
+                            breadcrumbs: [
+                                { name: `Home`, link: `` },
+                                { name: "User", link: "" },
+                                { name: "User", link: "/panel/users/add" },
+                            ],
+                        },
+                    }
+                ]
             },
             {
                 path: "/panel/profile",

@@ -9,9 +9,10 @@
                             <h6 class="card-subtitle text-muted fz-13">The following is a list of users in the Hidayah app.</h6>
                         </div>
                         <div class="action my-auto">
-                            <button class="btn btn-sm btn-success" @click="openModal()">
+                            <!-- <button class="btn btn-sm btn-success" @click="openModal()">
                                 <i class="bi bi-plus fz-16 fw-bold"></i>
-                            </button>
+                            </button> -->
+                            <router-link class="btn btn-sm btn-success" :to="{ name: 'UserAdd'}"><i class="bi bi-plus fz-16 fw-bold"></i></router-link>
                         </div>
                     </div>
                     <div class="card-body">
