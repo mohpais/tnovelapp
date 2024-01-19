@@ -97,7 +97,7 @@ const useFormValidation = () => {
 
       return result && !errors.value[fieldName];
     }, true);
-
+    console.log(isValid);
     return { isValid };
   };
 

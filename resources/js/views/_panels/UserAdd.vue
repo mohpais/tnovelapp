@@ -13,6 +13,19 @@
                         </div>
                     </div>
                     <div class="card-body">
+                        <!-- <form autocomplete="off" @submit="onSubmit" novalidate>
+                            <MyInput
+                                id="username"
+                                name="username"
+                                type="text"
+                                placeholder="Enter your username"
+                                v-model="formData.username"
+                                :required="true"
+                                labelName="Username"
+                            />
+                            <button type="submit">Submit</button>
+
+                        </form> -->
                         <MyFormProvider :id="formId" :formData="formData" @submit="onSubmit" ref="formProvider">
                             <MyInput
                                 id="username"
@@ -43,9 +56,6 @@
                                 :required="true"
                                 labelName="Email"
                             />
-
-                            <!-- Add other inputs as needed -->
-
                             <button type="submit">Submit</button>
                         </MyFormProvider>
                     </div>
@@ -56,29 +66,31 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue';
+    import { ref, reactive } from 'vue';
 
     import MyInput from '@/components/atoms/MyInput.vue';
     import MyFormProvider from '@/components/organisms/MyFormProvider.vue';
+    import useFormValidation from "@/global/useFormValidation";
+    const { errors } = useFormValidation();
 
     const formId = 'yourForm';
     const formProvider = ref(null)
-    const formData = ref({
+    const formData = reactive({
         username: '',
         password: '',
         email: '',
         // Add other form fields as needed
     });
-
     const onSubmit = () => {
+        console.log(formProvider.value);
         // Trigger validation
-        const isValid = formProvider.value.validateForm();
+        // const isValid = formProvider.value.validateForm();
 
-        if (isValid) {
-            // Proceed with form submission logic
-            console.log('Form submitted:', formData.value);
-        } else {
-            console.log('Form validation failed. Please check errors.');
-        }
+        // if (isValid) {
+        //     // Proceed with form submission logic
+        //     console.log('Form submitted:', formData.value);
+        // } else {
+        //     console.log('Form validation failed. Please check errors.');
+        // }
     };
 </script>
