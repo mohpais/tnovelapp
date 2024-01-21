@@ -1,13 +1,9 @@
 import Rest from "@/global/rest"; // Import from Global Packages
 const rest = new Rest().Api(); // Creating a Rest instance
 
-export * from './account-service';
-export * from './user-service';
-export * from './role-service';
-
-export const GetListDataTables = async (_url, payload) => {
+export const GetRoleList = async (payload) => {
     try {
-        return await rest.post(_url, payload);
+        return await rest.get(`role/list`, payload);
     } catch (error) {
         console.log(error);
         throw new Error(error);

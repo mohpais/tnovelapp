@@ -8,6 +8,7 @@ async function requireLogin(to, from, next) {
     let authenticated, roles;
     roles = authStore.roleUser;
     authenticated = !!authStore.authenticated;
+    console.log(authenticated);
     if (authenticated) {
         if (to.meta.roles && !helpers.isSubArray(to.meta.roles, roles)) {
             next('/forbidden');
@@ -26,7 +27,8 @@ async function isLogin(to, from, next) {
     authenticated = !!authStore.authenticated;
     roles = authStore.roleUser;
     if (authenticated) {
-        if (helpers.isSubArray(['super-admin', 'admin-base', 'admin-content'], roles)) {
+        console.log(roles);
+        if (helpers.isSubArray(['Super Admin', 'Admin Base', 'Admin Content'], roles)) {
             next({ name: "Dashboard" });
         } else {
             next({ name: "Main" });
@@ -91,7 +93,7 @@ export default [
         path: "/panel",
         name: "Panel",
         redirect: { name: "Dashboard" },
-        meta: { layout: "logged-layout", roles: ['super-admin', 'admin-base', 'admin-content'] },
+        meta: { layout: "logged-layout", roles: ['Super Admin', 'Admin Base', 'Admin Content'] },
         beforeEnter: requireLogin,
         children: [
             {
@@ -114,12 +116,45 @@ export default [
                     {
                         path: "/panel/users/",
                         name: "UserList",
-                        component: () => import('@/views/_panels/User.vue'),
+                        component: () => import('@/views/_panels/user/List.vue'),
                         meta: {
                             title: "User List",
                             breadcrumbs: [
                                 { name: `Home`, link: `` },
                                 { name: "User", link: "/panel/users" },
+                            ],
+                        },
+                    },
+                    {
+                        path: "/panel/users/add",
+                        name: "UserAdd",
+                        component: () => import('@/views/_panels/user/Add.vue'),
+                        meta: {
+                            title: "User Add",
+                            breadcrumbs: [
+                                { name: `Home`, link: `` },
+                                { name: "User", link: "" },
+                                { name: "User", link: "/panel/users/add" },
+                            ],
+                        },
+                    }
+                ]
+            },
+            {
+                path: "/panel/forms",
+                name: "Forms",
+                redirect: { name: "BasicInput" },
+                children: [
+                    {
+                        path: "/panel/forms/basic-input",
+                        name: "BasicInput",
+                        component: () => import('@/views/_panels/components/Forms/BasicInput.vue'),
+                        meta: {
+                            title: "Basic Input",
+                            breadcrumbs: [
+                                { name: `Home`, link: `` },
+                                { name: `Forms`, link: `/panel/forms` },
+                                { name: `Basic Input`, link: `/panel/forms/basic-input` },
                             ],
                         },
                     },

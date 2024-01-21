@@ -124,8 +124,8 @@
 
     let state = reactive({
         isLoading: false,
-        lengthOptions: props.options.lengthOptions ?? [10, 25, 50, 100],
-        selectedLength: props.options.displayLength ?? 10,
+        lengthOptions: props.options.lengthOptions ?? [5, 10, 25, 50, 100],
+        selectedLength: props.options.displayLength ?? 5,
         sortOrders: props.options.orders ?? new Array(),
         searchable: props.options.searchable ?? true,
         searchData: computed(() => {

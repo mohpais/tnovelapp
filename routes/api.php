@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\RoleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,7 +29,14 @@ Route::group([
 Route::group([
     'prefix' => 'user'
 ], function ($router) {
-    Route::get('/list', [UserController::class, 'index']);  
+    Route::get('/list', [UserController::class, 'index']);
+    Route::post('/create', [UserController::class, 'store']);
     Route::post('/list-datatables', [UserController::class, 'list']);  
+});
+
+Route::group([
+    'prefix' => 'role'
+], function ($router) {
+    Route::get('/list', [RoleController::class, 'index']);  
 });
 

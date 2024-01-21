@@ -6,6 +6,8 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Role;
 
+use Cviebrock\EloquentSluggable\Services\SlugService;
+
 class RoleSeeder extends Seeder
 {
     /**
@@ -15,27 +17,32 @@ class RoleSeeder extends Seeder
     {
         $roleData = [
             [
-                'name' => 'super-admin',
+                'name' => 'Super Admin',
+                // 'slug' => 'super-admin',
                 'created_by' => 'System',
                 'updated_by' => 'System'
             ],
             [
-                'name' => 'admin-content',
+                'name' => 'Admin Content',
+                // 'slug' => 'admin-content',
                 'created_by' => 'System',
                 'updated_by' => 'System'
             ],
             [
-                'name' => 'admin-user',
+                'name' => 'Admin User',
+                // 'slug' => 'admin-user',
                 'created_by' => 'System',
                 'updated_by' => 'System'
             ],
             [
-                'name' => 'premium-user',
+                'name' => 'Premium User',
+                // 'slug' => 'premium-user',
                 'created_by' => 'System',
                 'updated_by' => 'System'
             ],
             [
-                'name' => 'ordinary-user',
+                'name' => 'Ordinary User',
+                // 'slug' => 'ordinary-user',
                 'created_by' => 'System',
                 'updated_by' => 'System'
             ]

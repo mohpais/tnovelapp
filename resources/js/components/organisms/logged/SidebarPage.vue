@@ -144,12 +144,15 @@
                                             <li class="sidebar-item"><a class="sidebar-link" href="/icons-font-awesome">Font Awesome <span class="sidebar-badge badge bg-primary">Pro</span></a></li>
                                         </ul>
                                     </li>
-                                    <li class="sidebar-item">
+                                    <li class="sidebar-item" :class="{ 'active': isActive('/panel/forms', ['', '']) }">
                                         <a data-bs-target="#forms" data-bs-toggle="collapse" class="sidebar-link collapsed">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-check-circle align-middle"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span class="align-middle">Forms</span>
                                         </a>
                                         <ul id="forms" class="sidebar-dropdown list-unstyled collapse " data-bs-parent="#sidebar">
-                                            <li class="sidebar-item"><a class="sidebar-link" href="/forms-basic-inputs">Basic Inputs</a></li>
+                                            <li class="sidebar-item" :class="{ 'active': isActive('/panel/forms/basic-input') }">
+                                                <router-link class="sidebar-link" to="/panel/forms/basic-input" >Basic Inputs</router-link>
+                                            </li>
+                                            <!-- <li class="sidebar-item"><a class="sidebar-link" href="/forms-basic-inputs">Basic Inputs</a></li> -->
                                             <li class="sidebar-item"><a class="sidebar-link" href="/forms-layouts">Form Layouts <span class="sidebar-badge badge bg-primary">Pro</span></a></li>
                                             <li class="sidebar-item"><a class="sidebar-link" href="/forms-input-groups">Input Groups <span class="sidebar-badge badge bg-primary">Pro</span></a></li>
                                         </ul>

@@ -6,13 +6,15 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\DataTableService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class UserController extends Controller
 {
     public function __construct(private DataTableService $dataTableService)
     {
-        $this->middleware('auth:api', ['except' => ['list']]);
+        $this->middleware('auth:api');
     }
     
     /**
@@ -41,55 +43,10 @@ class UserController extends Controller
     public function list(Request $request)
     {
         $query = User::query();
-        // dd($query);
         // Use the DataTableService or any other logic as needed
         $response = $this->dataTableService->getJsonResponse($query, $request);
-        // if ($request->has('columns')) {
-        //     $columns = $request->input('columns');
-    
-        //     // Loop through each column in the payload
-        //     foreach ($columns as $column) {
-        //         if (isset($column['searchable']) && !$column['searchable']) continue;
-                
-        //         if (isset($column['search']['value']) && $column['search']['value'] !== '') {
-        //             $searchValue = $column['search']['value'];
-                    
-        //             // Apply the search condition to the specified column
-        //             // $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
-        //             // Use where instead of orWhere for the first condition
-        //             $query->where(function ($query) use ($column, $searchValue) {
-        //                 $query->where($column['data'], 'like', '%' . $searchValue . '%');
-        //             });
-        //         }
-        //     }
-        // }
+        
         return response()->json($response, 200);
-    }
-
-    public function applySearch(Builder $query, Request $request)
-    {
-        if ($request->has('columns')) {
-            $columns = $request->input('columns');
-    
-            // Loop through each column in the payload
-            foreach ($columns as $column) {
-                if (isset($column['searchable']) && !$column['searchable']) continue;
-                
-                if (isset($column['search']['value']) && $column['search']['value'] !== '') {
-                    $searchValue = $column['search']['value'];
-    
-                    // Apply the search condition to the specified column
-                    // $query->orWhere($column['data'], 'like', '%' . $searchValue . '%');
-                    // Use where instead of orWhere for the first condition
-                    $query->where(function ($query) use ($column, $searchValue) {
-                        $query->where($column['data'], 'like', '%' . $searchValue . '%');
-                    });
-                }
-            }
-        }
-
-        // Return the modified query
-        return $query;
     }
 
     /**
@@ -97,7 +54,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -105,7 +62,34 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'fullname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'gender' => 'required',
+            'roleId' => 'required|numeric'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
+        }
+
+        $user = User::create([
+            'fullname' => $request->fullname,
+            'username' => explode('@', $request->email)[0],
+            'email' => $request->email,
+            'gender' => $request->gender,
+            'password' => Hash::make('random123'),
+        ]);
+        
+        $user->roles()->attach($request->roleId);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully'
+        ]);
     }
 
     /**

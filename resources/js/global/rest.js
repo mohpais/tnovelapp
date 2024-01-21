@@ -27,16 +27,25 @@ class Rest {
             !originalRequest._retry) ||
           error.message === "Network Error"
         ) {
+          debugger
           if (this.isRefreshing) {
-            try {
-              const token = await new Promise((resolve, reject) => {
-                this.failedRequests.push({ resolve, reject });
-              });
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-              return this.http(originalRequest);
-            } catch (e) {
-              return e;
-            }
+            sessionStorage.removeItem("_xa");
+            sessionStorage.removeItem("_us");
+            sessionStorage.removeItem("_rl");
+            window.location.reload();
+            // try {
+            //   const token = await new Promise((resolve, reject) => {
+            //     this.failedRequests.push({ resolve, reject });
+            //   });
+            //   originalRequest.headers.Authorization = `Bearer ${token}`;
+            //   return this.http(originalRequest);
+            // } catch (e) {
+            //   sessionStorage.removeItem("_xa");
+            //   sessionStorage.removeItem("_us");
+            //   sessionStorage.removeItem("_rl");
+            //   window.location.reload();
+            //   return e;
+            // }
           }
 
           // Set the flag to indicate that refreshing is in progress
@@ -55,6 +64,7 @@ class Rest {
               return this.http(originalRequest);
             })
             .catch((refreshError) => {
+              console.log('this');
               // Handle token refresh error
               console.error('Token refresh failed:', refreshError);
               // You might want to redirect the user to the login page or handle the error appropriately

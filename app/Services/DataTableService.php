@@ -24,7 +24,9 @@ class DataTableService
 
         // Apply pagination
         $perPage = $request->input('displayLength', 10);
-        $currentPage = ($request->input('page') - 1) / $perPage + 1;
+        // $currentPage = ($request->input('page') - 1) / $perPage + 1;
+        $currentPage = ceil(($request->input('page') - 1) / $perPage + 1); // Corrected calculation
+        // dd($currentPage);
 
         $data = $query->paginate($perPage, ['*'], 'page', $currentPage);
 
@@ -93,10 +95,20 @@ class DataTableService
                     $searchValue = $searchCondition['value'];
     
                     if ($columnIndex >= 0 && $columnIndex < count($request->input('columns'))) {
-                        $column = $request->input('columns')[$columnIndex];
+                        // $column = $request->input('columns')[$columnIndex];
     
+                        // // Apply the search condition to the specified column
+                        // $query->orWhere($column, 'like', '%' . $searchValue . '%');
+                        $columns = $request->input('columns');
+
                         // Apply the search condition to the specified column
-                        $query->orWhere($column, 'like', '%' . $searchValue . '%');
+                        $query->orWhere(function ($query) use ($columns, $columnIndex, $searchValue) {
+                            foreach ($columns as $i => $column) {
+                                if ($i === $columnIndex) {
+                                    $query->where($column, 'like', '%' . $searchValue . '%');
+                                }
+                            }
+                        });
                     }
                 }
             }

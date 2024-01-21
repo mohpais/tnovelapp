@@ -9,3 +9,12 @@ export const GetUserList = async () => {
         throw new Error(error);
     }
 };
+
+export const CreateUser = async (payload) => {
+    try {
+        return await rest.post(`user/create`, payload);
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+};

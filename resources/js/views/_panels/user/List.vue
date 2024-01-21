@@ -73,7 +73,7 @@
                     data: 'gender', 
                     orderable: false, 
                     render:  function ( data, type, row, meta ) {
-                        console.log(data, type, row, meta);
+                        // console.log(data, type, row, meta);
                         return `<span class="badge bg-success p-1">${data}</span>`;
                     },
                     // render: function ( data, type, row, meta ) {

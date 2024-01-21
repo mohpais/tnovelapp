@@ -766,7 +766,11 @@ let helpers = {
   },
 
   toTitleCase: (str) => {
-    return str.replace(/_/g, ' ').replace(/\b\w/g, firstLetter => firstLetter.toUpperCase());
+    // return str.replace(/_/g, ' ').replace(/\b\w/g, firstLetter => firstLetter.toUpperCase());
+    return str
+      .replace(/_/g, ' ')
+      .replace(/\-/g, ' ') // Replace '-' with space
+      .replace(/\b\w+\b/g, (word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase());
   },
 
   // Function to check if an object in the array has a specific property
