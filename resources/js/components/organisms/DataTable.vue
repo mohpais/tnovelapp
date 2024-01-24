@@ -20,30 +20,30 @@
                 <table ref="dataTable" class="table dataTable table-bordered table-striped">
                     <thead>
                         <tr>
-                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber" class="text-center" style="width: 5px;">#</th>
+                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber" class="text-center" style="width: 5px;" :class="{
+                                'fixed-column-left': props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')
+                            }">#</th>
                             <th 
                                 v-for="(column, index) in options.columns" 
                                 :key="index" 
                                 :style="{ width: column.width }" 
                                 @click="handleSort(index)"
-                                :class="{
-                                    'd-none': column.hasOwnProperty('visible') && !column.visible,
-                                    'sorting': !column.hasOwnProperty('orderable'),
-                                    'sorting_disabled': column.hasOwnProperty('orderable') && column.orderable === false,
-                                    'sorting_asc': (!column.hasOwnProperty('orderable') || (column.hasOwnProperty('orderable') && column.orderable === true)) && getSortIcon(index) === 'asc',
-                                    'sorting_desc': (!column.hasOwnProperty('orderable') || (column.hasOwnProperty('orderable') && column.orderable === true)) && getSortIcon(index) === 'desc'
-                                }">
+                                :class="hasClassHeader(column, index)">
                                     {{ helpers.toTitleCase(column.text ?? column.data)  }}
                             </th>
                             <th v-if="hasActions || (options.hasOwnProperty('action') && options.action)" class="fixed-column-action"></th>
                         </tr>
                         <tr v-if="state.searchable && helpers.hasProperty(options.columns, 'searchable')">
-                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber"></th>
+                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber" :class="{
+                                'fixed-column-left': props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')
+                            }"></th>
                             <th
-                                v-for="(column, index) in options.columns.filter(column => column.visible === undefined || column.visible === true)" :key="index">
-                                <input v-if="column.searchable" type="text" :id="column.data" class="form-control" @change="handleSearch" />
+                                v-for="(column, index) in options.columns.filter(column => column.visible === undefined || column.visible === true)" :key="index"
+                                :class="hasClassSearch(index)"
+                                >
+                                <input v-if="column.searchable" type="text" :id="column.data" class="form-control" @change="handleSearch" autocomplete="off" />
                             </th>
-                            <th v-if="hasActions || (options.hasOwnProperty('action') && options.action)"></th>
+                            <th v-if="hasActions || (options.hasOwnProperty('action') && options.action)" class="fixed-column-action"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,12 +66,14 @@
                             </td>
                         </tr>
                         <tr v-else-if="!state.isLoading && state.data.length > 0" v-for="(item, row) in state.data" :key="row">
-                            <td v-if="options.hasOwnProperty('rownumber') && options.rownumber" class="text-center" >{{ startEntry+row }}</td>
-                            <td v-for="(column, col) in options.columns" :key="col" :class="addClass(column, item)">
+                            <td v-if="options.hasOwnProperty('rownumber') && options.rownumber" :class="{
+                                'fixed-column-left': props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')
+                            }">{{ startEntry+row }}</td>
+                            <td v-for="(column, col) in options.columns" :key="col" :class="hasClassBody(column, item, col)">
                                 <!-- Check if the column has a render function -->
                                 <template v-if="typeof column.render === 'function'">
                                     <!-- Call the render function with appropriate parameters -->
-                                    <div v-html="column.render(item[column.data], 'display', item, { row, col })"></div>
+                                    <div class="w-100" v-html="column.render(item[column.data], 'display', item, { row, col })"></div>
                                 </template>
                                 <template v-else>
                                     <!-- Display item[column.data] for regular columns -->
@@ -87,28 +89,16 @@
                                     <div 
                                         class="dropdown-menu"  :aria-labelledby="`dropdown-menu-${row}`"
                                     >
-                                        <a type="button" @click="openModal(item)" class="dropdown-item" href="#"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+                                        <!-- <a type="button" @click="openModal(item)" class="dropdown-item" href="#"><i class="bi bi-pencil-square me-1"></i>Edit</a> -->
+                                        <router-link class="dropdown-item" :to="{ path: route.path + `edit/${item.id}` }">
+                                            <i class="bi bi-pencil-square me-1"></i>Edit
+                                        </router-link>
                                         <a class="dropdown-item" href="#"><i class="bi bi-trash me-1"></i>Delete</a>
                                         <a class="dropdown-item" href="#"><i class="bi bi-link me-1"></i>Detail</a>
                                         <!-- <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Separated link</a> -->
                                     </div>
                                 </div>
-                                <!-- <div class="position-relative"> -->
-                                    <!-- <button class="btn btn-sm btn-success" @click="openModal(item)">Test</button> -->
-                                    <!-- <div class="dropdown">
-                                        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-        
-                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                                            <li><a type="button" @click="openModal(item)" class="dropdown-item" href="#">Edit</a></li>
-                                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                                            <li><a class="dropdown-item" href="#">Something else here</a></li>
-                                        </ul>
-                                    </div> -->
-                                    <!-- <slot name="actions" :item="item"></slot>
-                                </div> -->
                             </td>
                         </tr>
                     </tbody>
@@ -117,7 +107,7 @@
         </div>
         <div class="row mt-2 justify-content-between">
             <div class="col ps-0 my-auto">
-                <span>Showing {{ startEntry }} to {{ endEntry }} of {{ totalEntries }} entries</span>
+                <span>Showing {{ isNaN(startEntry) ? 0 : startEntry }} to {{ isNaN(endEntry) ? 0 : endEntry }} of {{ isNaN(totalEntries) ? 0 : totalEntries }} entries</span>
             </div>
             <div class="col-auto pe-0">
                 <Pagination v-if="!state.isLoading" :pagination="state.pagination" @page-change="loadData" />
@@ -132,7 +122,8 @@
   
 <script setup>
     /** Import package */
-    import { ref, computed, reactive, onMounted, getCurrentInstance, watch, toRefs } from "vue";
+    import { ref, computed, reactive, getCurrentInstance, watch, onMounted, onUpdated, nextTick } from "vue";
+    import { useRoute } from 'vue-router';
     /** Import component */
     import Pagination from '@/components/molekuls/Pagination.vue'; // Adjust the path accordingly
     /** Import global */
@@ -151,6 +142,7 @@
         }
     });
     /** Define variable */
+    const route = useRoute();
     let dataTable = ref(null);
     const hasActions = computed(() => {
         const instance = getCurrentInstance();
@@ -179,16 +171,48 @@
     let totalEntries = computed(() => state.pagination.total);
 
 
-    onMounted(async () => await loadData());
+    onMounted(async () => {
+        await loadData();
+    });
 
-    const hasClass = (manualClassName = "") => {
-        let classData = manualClassName;
-        if (options.hasOwnProperty('fixedColumns') ) {
-            
+    const hasClassHeader = (column, index) => {
+        let className = ''
+        if (column.hasOwnProperty('visible') && !column.visible) 
+            className += 'd-none ';
+        if (!column.hasOwnProperty('orderable')) 
+            className += 'sorting ';
+        if (column.hasOwnProperty('orderable') && !column.orderable) 
+            className += 'sorting_disabled ';
+        if ((!column.hasOwnProperty('orderable') || (column.hasOwnProperty('orderable') && column.orderable === true)) && getSortIcon(index) === 'asc') 
+            className += 'sorting_asc ';
+        if ((!column.hasOwnProperty('orderable') || (column.hasOwnProperty('orderable') && column.orderable === true)) && getSortIcon(index) === 'desc') 
+            className += 'sorting_desc ';
+            // fixed-column
+        if (props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')) {
+            let idxFixedLeft = props.options.fixedColumns.left;
+            if (index < idxFixedLeft) {
+                // className += 'fixed-column-left-header ';
+                className += 'fixed-column-left ';
+            }
         }
+        
+        return className;
+    }
+
+    const hasClassSearch = (index) => {
+        let className = ''
+        if (props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')) {
+            let idxFixedLeft = props.options.fixedColumns.left;
+            if (index < idxFixedLeft - (props.options.columns.filter(column => column.visible).length + 2)) {
+                // className += 'fixed-column-left-header ';
+                className += 'fixed-column-left ';
+            }
+        }
+        
+        return className;
     }
         
-    const addClass = (column, item) => {
+    const hasClassBody = (column, item, index) => {
         let classData = '';
         if (column.hasOwnProperty('className')) {
             classData += column.className + ' ';
@@ -198,34 +222,15 @@
         } else if (!item[column.data]) {
             classData += 'text-center ';
         }
+        if (props.options.hasOwnProperty('fixedColumns') && props.options.fixedColumns.hasOwnProperty('left')) {
+            let idxFixedLeft = props.options.fixedColumns.left;
+            if (index < idxFixedLeft) {
+                // classData += 'fixed-column-left-body ';
+                classData += 'fixed-column-left ';
+            }
+        }
         
         return classData;
-    }
-
-    const handleDropdown = (row) => {
-        const dataTableElement = document.getElementsByClassName('dataTable')[0]
-        const elementButton = row.srcElement;
-        const elementButtonId = elementButton.getAttribute('id');
-        if (elementButton.classList.contains('show')) {
-            elementButton.classList.remove("show");
-            elementButton.setAttribute('aria-expanded', 'false');
-            const elementDropdown = dataTableElement.querySelector(`div[aria-labelledby="${elementButtonId}"]`);
-            elementDropdown.classList.remove("show");
-            elementDropdown.style.position = "";
-            elementDropdown.style.inset = "";
-            elementDropdown.style.margin = "";
-            elementDropdown.style.transform = "";
-            // position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(0px, -34px, 0px);
-        } else {
-            elementButton.classList.add("show");
-            elementButton.setAttribute('aria-expanded', 'true');
-            const elementDropdown = dataTableElement.querySelector(`div[aria-labelledby="${elementButtonId}"]`);
-            elementDropdown.classList.add("show");
-            elementDropdown.style.position = "absolute";
-            elementDropdown.style.inset = "auto auto 0px 0px";
-            elementDropdown.style.margin = "0px";
-            elementDropdown.style.transform = "translate3d(-93.6667px, 34px, 0px)";
-        }
     }
 
     const loadData = async (page = 1) => {
@@ -293,11 +298,35 @@
         { immediate: true }
     );
 
+    onUpdated(() => {
+        nextTick(() => {
+            if (
+                props.options.hasOwnProperty('fixedColumns') && 
+                props.options.fixedColumns.hasOwnProperty('left') && 
+                props.options.fixedColumns.left > 0
+            ) {
+                const rows = dataTable.value.querySelectorAll("tr");
+                rows.forEach((row) => {
+                    const cells = row.querySelectorAll("td.fixed-column-left, th.fixed-column-left");
+                    let totalWidth = 0;
+                    cells.forEach((cell) => {
+                        // console.log(cell.tagName.toLowerCase());
+                        cell.style.left = `${totalWidth}px`;
+                        totalWidth += cell.offsetWidth;
+                        if (cell.tagName.toLowerCase() == 'td') {
+                            cell.style.backgroundColor = '#fff';
+                        }
+                    });
+                });
+            }
+        });
+    });
+
     const emits = defineEmits(["openModal"]);
 
     const openModal = (item) => {
-      // Default action logic
-      return emits("openModal", item);
+        // Default action logic
+        return emits("openModal", item);
     }
 </script>
   
@@ -324,12 +353,17 @@
                 }
             }
         };
-        .fixed-column {
+        .fixed-column-left {
+            border-right: 1px solid #dee2e6 !important;
+            border-left: 1px solid #dee2e6 !important;
             position: sticky;
-            left: 0;
             z-index: 1;
-            background-color: #fff;
+            :last-child {
+                // box-shadow: 2px 4px #dee2e6;;
+            }
+            // background-color: #fff;
         }
+
         .fixed-column-action {
             border-left: 1px solid #dee2e6;
             position: sticky;
@@ -343,14 +377,5 @@
             right: 50px !important;
             top: -28px !important;
         }
-
-        // .fixed-column-action .dropdown-menu.show .dropdown-item {
-        //     background-color: white !important;
-        // }
-
-        // .dropdown-menu.show {
-        //     z-index: 3;
-        //     top: 0;
-        // }
     }
 </style>

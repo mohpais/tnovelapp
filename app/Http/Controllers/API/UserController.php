@@ -42,7 +42,12 @@ class UserController extends Controller
      */
     public function list(Request $request)
     {
-        $query = User::query();
+        // Get the ID of the currently authenticated user
+        $currentUser = Auth::user();
+
+        // Build the query excluding the current user
+        $query = User::where('email', '<>', $currentUser->email)
+            ->with('roles');
         // Use the DataTableService or any other logic as needed
         $response = $this->dataTableService->getJsonResponse($query, $request);
         

@@ -42,7 +42,7 @@
         </div>
     </div>
     <!-- Modal edit -->
-    <Modal v-if="editUserForm" id="modal-edit" title="Edit User" ref="modalEdit">
+    <!-- <Modal id="modal-edit" title="Edit User" ref="modalEdit">
         <template #body>
             <MyFormProvider id="formEdit" :formData="editUserForm" @onSubmit="onSubmit">
                 <FormControl
@@ -56,7 +56,7 @@
                 <button type="submit" class="btn btn-warning">Edit</button>
             </MyFormProvider>
         </template>
-    </Modal>
+    </Modal> -->
 </template>
 
 <script setup>
@@ -86,7 +86,7 @@
         dataTable: {
             api: 'user/list-datatables',
             fixedColumns: {
-                left: 2
+                left: 3
             },
             columns: [
                 { data: 'id', visible: false },
@@ -96,13 +96,16 @@
                     orderable: false, 
                     render:  function ( data, type, row, meta ) {
                         // console.log(data, type, row, meta);
-                        let img = `<img src="${profileImg}" width="32" height="32" class="rounded-circle my-n1" alt="Avatar">`;
-                        let rn = `<div class="d-flex">${img}<span>${row.fullname}</span></div>`;
+                        let roledata = row.roles.map(obj => obj.name).join(', ');
+
+                        let img = `<img src="${profileImg}" width="32" height="32" class="rounded-circle" alt="Avatar">`;
+                        let usr = `<div class="ms-2 d-flex flex-column"><span class="fw-bold">${row.fullname}</span><span class="text-muted fz-10">${roledata}</span></div>`;
+                        let rn = `<div class="d-flex">${img}${usr}</div>`;
                         // return `<img src="${profileImg}" width="32" height="32" class="rounded-circle my-n1" alt="Avatar">`;
                         return rn;
                     },
                 },
-                { text: 'Name', data: 'fullname', searchable: true },
+                { text: 'Name', data: 'fullname', visible: false, searchable: true },
                 { data: 'username' },
                 { data: 'email', searchable: true, orderable: false },
                 { data: 'birthday', orderable: false },
@@ -121,10 +124,12 @@
                 },
                 {
                     data: 'status',
-                    render: function (data) {
-                        return `<div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" ${data ? 'checked' : ''}>
+                    render: function (data, type, row, meta) {
+                        let switchButton = `<div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="status-id-${row.id}" ${data ? 'checked' : ''}>
                             </div>`
+                        let div = `<div class="d-flex justify-content-center">${switchButton}</div>`
+                        return div;
                     }
                 },
                 { 
@@ -134,11 +139,12 @@
                         return `<span class="">${helpers.formatDate(data, 'dateTime')}</span>`;
                     },
                 },
+                { data: 'roles', visible: false },
                 // Add more column definitions as needed
             ],
             orders: [
                 {
-                    column: 7,
+                    column: 8,
                     dir: "desc"
                 }
             ],
@@ -147,7 +153,12 @@
             searchable: true
         }
     });
-    let editUserForm = ref(null);
+    let editUserForm = reactive({
+        fullname: '',
+        email: '',
+        username: '',
+        birthday: ''
+    });
 
     /** Define method */
     const openModal = (item) => {
@@ -156,8 +167,8 @@
             // editUserForm.forEach((key, value) => {
             //     console.log(key, value);
             // });
-            editUserForm = item;
-            console.log(editUserForm);
+            // editUserForm = item;
+            // console.log(editUserForm);
             // modalEdit.value.show();
             // console.log(editUserForm);
             // return modalEdit.value.show();

@@ -8,7 +8,7 @@ async function requireLogin(to, from, next) {
     let authenticated, roles;
     roles = authStore.roleUser;
     authenticated = !!authStore.authenticated;
-    console.log(authenticated);
+    // console.log(authenticated);
     if (authenticated) {
         if (to.meta.roles && !helpers.isSubArray(to.meta.roles, roles)) {
             next('/forbidden');
@@ -133,8 +133,21 @@ export default [
                             title: "User Add",
                             breadcrumbs: [
                                 { name: `Home`, link: `/panel/` },
-                                { name: "User", link: "/panel/users" },
+                                { name: "User", link: "/panel/users/" },
                                 { name: "Add", link: "/panel/users/add" },
+                            ],
+                        },
+                    },
+                    {
+                        path: "/panel/users/edit/:id",
+                        name: "UserEdit",
+                        component: () => import('@/views/_panels/user/Edit.vue'),
+                        meta: {
+                            title: "User Edit",
+                            breadcrumbs: [
+                                { name: `Home`, link: `/panel/` },
+                                { name: "User", link: "/panel/users/" },
+                                { name: "Edit", link: "/panel/users/edit" },
                             ],
                         },
                     }
@@ -158,19 +171,19 @@ export default [
                             ],
                         },
                     },
-                    {
-                        path: "/panel/users/add",
-                        name: "UserAdd",
-                        component: () => import('@/views/_panels/UserAdd.vue'),
-                        meta: {
-                            title: "User Add",
-                            breadcrumbs: [
-                                { name: `Home`, link: `` },
-                                { name: "User", link: "" },
-                                { name: "User", link: "/panel/users/add" },
-                            ],
-                        },
-                    }
+                    // {
+                    //     path: "/panel/users/add",
+                    //     name: "UserAdd",
+                    //     component: () => import('@/views/_panels/UserAdd.vue'),
+                    //     meta: {
+                    //         title: "User Add",
+                    //         breadcrumbs: [
+                    //             { name: `Home`, link: `` },
+                    //             { name: "User", link: "" },
+                    //             { name: "Add", link: "/panel/users/add" },
+                    //         ],
+                    //     },
+                    // }
                 ]
             },
             {
