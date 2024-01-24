@@ -16,31 +16,45 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <data-table :options="state.dataTable">
+                        <data-table :options="state.dataTable" @openModal="openModal">
                              <!-- Custom actions for each row -->
-                            <template #actions="{ item }">
+                             <!-- <template #actions="{ item }">
+                                <div class="dropdown">
+                                    <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+    
+                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                        <li><a class="dropdown-item" href="#">Action</a></li>
+                                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    </ul>
+                                </div>
+                            </template> -->
+                            <!-- <template #actions="{ item }">
                                 <button class="btn btn-sm btn-info me-1" @click.prevent="openModal(item)"><i class="bi bi-pencil-square"></i></button>
                                 <button class="btn btn-sm btn-danger" @click="deleteUser(item)"><i class="bi bi-trash"></i></button>
-                                <!-- Add more custom actions as needed -->
-                            </template>
+                            </template> -->
                         </data-table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Modal add -->
-    <Modal id="modal-add" title="Add User" ref="modalAdd">
-        <template #body>This should be in the body</template>
-        <template #footer>
-            <button class="btn btn-primary">Save</button>
-        </template>
-    </Modal>
     <!-- Modal edit -->
-    <Modal id="modal-edit" title="Edit User" ref="modalEdit">
-        <template #body>This should be in the body</template>
-        <template #footer>
-            <button class="btn btn-warning">Save</button>
+    <Modal v-if="editUserForm" id="modal-edit" title="Edit User" ref="modalEdit">
+        <template #body>
+            <MyFormProvider id="formEdit" :formData="editUserForm" @onSubmit="onSubmit">
+                <FormControl
+                    id="fullname"
+                    labelName="Full Name"
+                    placeholder="Enter your full name ..."
+                    v-model="editUserForm.fullname"
+                    :required="true"
+                />
+                <hr />
+                <button type="submit" class="btn btn-warning">Edit</button>
+            </MyFormProvider>
         </template>
     </Modal>
 </template>
@@ -57,16 +71,39 @@
     const Modal = defineAsyncComponent(() =>
         import("@/components/organisms/Modal.vue")
     );
+    const MyFormProvider = defineAsyncComponent(() =>
+        import("@/components/organisms/MyFormProvider.vue")
+    );
+    const FormControl = defineAsyncComponent(() =>
+        import("@/components/molekuls/FormControl.vue")
+    );
+    import profileImg from '@/assets/images/avatar-4.jpg';
+    
 
     /**  Define variables */
-    let modalAdd = ref(null);
     let modalEdit = ref(null);
     let state = reactive({
         dataTable: {
             api: 'user/list-datatables',
+            fixedColumns: {
+                left: 2
+            },
             columns: [
-                { data: 'id', width: '5%' },
-                { text: 'Full Name', data: 'fullname', searchable: true },
+                { data: 'id', visible: false },
+                { 
+                    text: 'Profile', 
+                    data: 'photo_profile', 
+                    orderable: false, 
+                    render:  function ( data, type, row, meta ) {
+                        // console.log(data, type, row, meta);
+                        let img = `<img src="${profileImg}" width="32" height="32" class="rounded-circle my-n1" alt="Avatar">`;
+                        let rn = `<div class="d-flex">${img}<span>${row.fullname}</span></div>`;
+                        // return `<img src="${profileImg}" width="32" height="32" class="rounded-circle my-n1" alt="Avatar">`;
+                        return rn;
+                    },
+                },
+                { text: 'Name', data: 'fullname', searchable: true },
+                { data: 'username' },
                 { data: 'email', searchable: true, orderable: false },
                 { data: 'birthday', orderable: false },
                 { 
@@ -82,30 +119,63 @@
                     //         data;
                     // }
                 },
+                {
+                    data: 'status',
+                    render: function (data) {
+                        return `<div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" ${data ? 'checked' : ''}>
+                            </div>`
+                    }
+                },
+                { 
+                    data: 'created_at', 
+                    render:  function ( data, type, row, meta ) {
+                        // console.log(data, type, row, meta);
+                        return `<span class="">${helpers.formatDate(data, 'dateTime')}</span>`;
+                    },
+                },
                 // Add more column definitions as needed
             ],
             orders: [
                 {
-                    column: 0,
-                    dir: "asc"
-                },
-                // {
-                //     column: 1,
-                //     dir: "asc"
-                // }
+                    column: 7,
+                    dir: "desc"
+                }
             ],
+            action: true,
+            rownumber: true,
             searchable: true
         }
     });
+    let editUserForm = ref(null);
 
     /** Define method */
     const openModal = (item) => {
         // Default action logic
         if (item) {
-            return modalEdit.value.show();
+            // editUserForm.forEach((key, value) => {
+            //     console.log(key, value);
+            // });
+            editUserForm = item;
+            console.log(editUserForm);
+            // modalEdit.value.show();
+            // console.log(editUserForm);
+            // return modalEdit.value.show();
         }
 
-        return modalAdd.value.show();
+        // return modalAdd.value.show();
+    }
+
+    const handleEdit = () => {
+        console.log(editUserForm);
+        // formProvider.value.onSubmit();
+    }
+
+    const onSubmit = async (isValid) => {
+        // state.isLoading = true;
+        console.log('here', isValid);
+        // if (isValid) {
+        // }
     }
 
     const deleteUser = async (item) => {

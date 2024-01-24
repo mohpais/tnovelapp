@@ -1,7 +1,7 @@
 <template>
-    <div class="col-sm-12" style="max-height: fit-content; height: 100%;">
+    <div class="px-3">
         <div class="row justify-content-between">
-            <div class="col-sm-12 col-md-6 my-auto">
+            <div class="col-sm-12 px-0 col-md-6 my-auto">
                 <div class="d-inline-block fz-12" id="reponsive_length">
                     <label>
                         Show 
@@ -15,17 +15,19 @@
                 </div>
             </div>
         </div>
-        <div class="row position-relative">
-            <div class="col-sm-12 table-responsive">
-                <table class="table dataTable table-bordered table-striped">
+        <div class="row">
+            <div class="col-sm-12 px-0 table-responsive">
+                <table ref="dataTable" class="table dataTable table-bordered table-striped">
                     <thead>
                         <tr>
+                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber" class="text-center" style="width: 5px;">#</th>
                             <th 
                                 v-for="(column, index) in options.columns" 
                                 :key="index" 
                                 :style="{ width: column.width }" 
                                 @click="handleSort(index)"
                                 :class="{
+                                    'd-none': column.hasOwnProperty('visible') && !column.visible,
                                     'sorting': !column.hasOwnProperty('orderable'),
                                     'sorting_disabled': column.hasOwnProperty('orderable') && column.orderable === false,
                                     'sorting_asc': (!column.hasOwnProperty('orderable') || (column.hasOwnProperty('orderable') && column.orderable === true)) && getSortIcon(index) === 'asc',
@@ -33,19 +35,20 @@
                                 }">
                                     {{ helpers.toTitleCase(column.text ?? column.data)  }}
                             </th>
-                            <th v-if="hasActions">Actions</th>
+                            <th v-if="hasActions || (options.hasOwnProperty('action') && options.action)" class="fixed-column-action"></th>
                         </tr>
                         <tr v-if="state.searchable && helpers.hasProperty(options.columns, 'searchable')">
+                            <th v-if="options.hasOwnProperty('rownumber') && options.rownumber"></th>
                             <th
-                                v-for="(column, index) in options.columns" :key="index">
+                                v-for="(column, index) in options.columns.filter(column => column.visible === undefined || column.visible === true)" :key="index">
                                 <input v-if="column.searchable" type="text" :id="column.data" class="form-control" @change="handleSearch" />
                             </th>
-                            <th v-if="hasActions"></th>
+                            <th v-if="hasActions || (options.hasOwnProperty('action') && options.action)"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-if="state.isLoading">
-                            <td :colspan="hasActions ? options.columns.length + 1 : options.columns.length" class="text-center py-4">
+                            <td :colspan="hasActions || (options.hasOwnProperty('action') && options.action) ? options.columns.length + 1 : options.columns.length" class="text-center py-4">
                                 <div class="spinner-border text-secondary me-1" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -58,14 +61,13 @@
                             </td>
                         </tr>
                         <tr v-else-if="!state.isLoading && !state.data">
-                            <td :colspan="hasActions ? options.columns.length + 1 : options.columns.length" class="text-center">
+                            <td :colspan="hasActions || (options.hasOwnProperty('action') && options.action) ? options.columns.length + 1 : options.columns.length" class="text-center">
                                 <h6>No data entry!</h6>
                             </td>
                         </tr>
                         <tr v-else-if="!state.isLoading && state.data.length > 0" v-for="(item, row) in state.data" :key="row">
-                            <td v-for="(column, col) in options.columns" :key="col" :class="{
-                                'text-center': !item[column.data]
-                            }">
+                            <td v-if="options.hasOwnProperty('rownumber') && options.rownumber" class="text-center" >{{ startEntry+row }}</td>
+                            <td v-for="(column, col) in options.columns" :key="col" :class="addClass(column, item)">
                                 <!-- Check if the column has a render function -->
                                 <template v-if="typeof column.render === 'function'">
                                     <!-- Call the render function with appropriate parameters -->
@@ -77,23 +79,55 @@
                                 </template>
 
                             </td>
-                            <td v-if="hasActions">
-                                <slot name="actions" :item="item"></slot>
+                            <td v-if="hasActions || (options.hasOwnProperty('action') && options.action)" class="fixed-column-action bg-white">
+                                <div class="btn-group position-relative">
+                                    <button type="button" :id="`dropdown-menu-${row}`" class="btn btn-sm btn-link dropdown-toggle border" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <div 
+                                        class="dropdown-menu"  :aria-labelledby="`dropdown-menu-${row}`"
+                                    >
+                                        <a type="button" @click="openModal(item)" class="dropdown-item" href="#"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+                                        <a class="dropdown-item" href="#"><i class="bi bi-trash me-1"></i>Delete</a>
+                                        <a class="dropdown-item" href="#"><i class="bi bi-link me-1"></i>Detail</a>
+                                        <!-- <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item" href="#">Separated link</a> -->
+                                    </div>
+                                </div>
+                                <!-- <div class="position-relative"> -->
+                                    <!-- <button class="btn btn-sm btn-success" @click="openModal(item)">Test</button> -->
+                                    <!-- <div class="dropdown">
+                                        <button class="btn btn-link dropdown-toggle" type="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+        
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                            <li><a type="button" @click="openModal(item)" class="dropdown-item" href="#">Edit</a></li>
+                                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                        </ul>
+                                    </div> -->
+                                    <!-- <slot name="actions" :item="item"></slot>
+                                </div> -->
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div class="row justify-content-between">
-            <div class="col my-auto">
+        <div class="row mt-2 justify-content-between">
+            <div class="col ps-0 my-auto">
                 <span>Showing {{ startEntry }} to {{ endEntry }} of {{ totalEntries }} entries</span>
             </div>
-            <div class="col-auto">
+            <div class="col-auto pe-0">
                 <Pagination v-if="!state.isLoading" :pagination="state.pagination" @page-change="loadData" />
             </div>
         </div>
     </div>
+    <!-- <div class="col-sm-12 table-responsive" style="max-height: fit-content; height: 100%;">
+        
+        
+    </div> -->
 </template>
   
 <script setup>
@@ -117,6 +151,7 @@
         }
     });
     /** Define variable */
+    let dataTable = ref(null);
     const hasActions = computed(() => {
         const instance = getCurrentInstance();
         return instance.slots.actions !== undefined;
@@ -146,6 +181,53 @@
 
     onMounted(async () => await loadData());
 
+    const hasClass = (manualClassName = "") => {
+        let classData = manualClassName;
+        if (options.hasOwnProperty('fixedColumns') ) {
+            
+        }
+    }
+        
+    const addClass = (column, item) => {
+        let classData = '';
+        if (column.hasOwnProperty('className')) {
+            classData += column.className + ' ';
+        }
+        if (column.hasOwnProperty('visible') && !column.visible) {
+            classData += 'd-none ';
+        } else if (!item[column.data]) {
+            classData += 'text-center ';
+        }
+        
+        return classData;
+    }
+
+    const handleDropdown = (row) => {
+        const dataTableElement = document.getElementsByClassName('dataTable')[0]
+        const elementButton = row.srcElement;
+        const elementButtonId = elementButton.getAttribute('id');
+        if (elementButton.classList.contains('show')) {
+            elementButton.classList.remove("show");
+            elementButton.setAttribute('aria-expanded', 'false');
+            const elementDropdown = dataTableElement.querySelector(`div[aria-labelledby="${elementButtonId}"]`);
+            elementDropdown.classList.remove("show");
+            elementDropdown.style.position = "";
+            elementDropdown.style.inset = "";
+            elementDropdown.style.margin = "";
+            elementDropdown.style.transform = "";
+            // position: absolute; inset: auto auto 0px 0px; margin: 0px; transform: translate3d(0px, -34px, 0px);
+        } else {
+            elementButton.classList.add("show");
+            elementButton.setAttribute('aria-expanded', 'true');
+            const elementDropdown = dataTableElement.querySelector(`div[aria-labelledby="${elementButtonId}"]`);
+            elementDropdown.classList.add("show");
+            elementDropdown.style.position = "absolute";
+            elementDropdown.style.inset = "auto auto 0px 0px";
+            elementDropdown.style.margin = "0px";
+            elementDropdown.style.transform = "translate3d(-93.6667px, 34px, 0px)";
+        }
+    }
+
     const loadData = async (page = 1) => {
         state.isLoading = true;
         let payload = {
@@ -168,6 +250,7 @@
             state.isLoading = false;
         }
     }
+        
     const handleSort = async (columnIndex) => {
         let existingOrder = state.sortOrders.find(order => order.column === columnIndex);
         if (existingOrder) {
@@ -210,14 +293,12 @@
         { immediate: true }
     );
 
-    const defaultAction = (item) => {
-      // Default action logic
-      console.log('Default action for item:', item);
-    }
+    const emits = defineEmits(["openModal"]);
 
-    // const handleLengthChange = () => {
-    // //   this.$emit('length-change', state.selectedLength);
-    // }
+    const openModal = (item) => {
+      // Default action logic
+      return emits("openModal", item);
+    }
 </script>
   
 <style lang="scss" scoped>
@@ -229,6 +310,7 @@
 
     $mobileFilterFont: 16px;
     .dataTable {
+        white-space: nowrap;
         font-size: 12px;
         thead {
             tr {
@@ -241,6 +323,34 @@
                     }
                 }
             }
+        };
+        .fixed-column {
+            position: sticky;
+            left: 0;
+            z-index: 1;
+            background-color: #fff;
         }
+        .fixed-column-action {
+            border-left: 1px solid #dee2e6;
+            position: sticky;
+            right: 0;
+            z-index: 1;
+            top: 0;
+        }
+
+        .fixed-column-action .dropdown-menu.show {
+            z-index: 1000; /* Adjust the value as needed */
+            right: 50px !important;
+            top: -28px !important;
+        }
+
+        // .fixed-column-action .dropdown-menu.show .dropdown-item {
+        //     background-color: white !important;
+        // }
+
+        // .dropdown-menu.show {
+        //     z-index: 3;
+        //     top: 0;
+        // }
     }
 </style>

@@ -27,8 +27,8 @@ class UserController extends Controller
         
         // Build the query excluding the current user
         $users = User::where('id', '!=', $currentUser->id)
-                    ->where('status', 1)
-                    ->select('id', 'fullname', 'username', 'email', 'phone', 'gender', 'birthday', 'address', 'photo_profile as photo', 'created_at as registered_at')
+                    ->select('id', 'fullname', 'username', 'email', 'phone', 'gender', 'birthday', 'address', 'photo_profile as photo', 'created_at as registered_at', 'roles.name as direct_role_name')
+                    ->with('roles')
                     ->get();
         foreach ($users as $user) {
             $user->age = isset($user->birthday) ? calculateAge($user->birthday) : null;

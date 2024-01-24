@@ -89,10 +89,10 @@ const useFormValidation = () => {
   };
 
   const submitValidation = (formElement, dataField) => {
+    // console.log(dataField);
     const isValid = computed(() => {
       return Object.keys(dataField).reduce((result, fieldName) => {
         const fieldValue = dataField[fieldName];
-        if (fieldName === 'birthday') debugger;
         const elementInput = formElement.querySelector(`#${fieldName}`);
         if (!elementInput) {
           const radioInputs  = formElement.querySelectorAll(`input[type="radio"][name="${fieldName}"]`); // Replace "yourRadioGroupName" with your actual radio button group name

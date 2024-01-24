@@ -38,10 +38,11 @@
                                 <a href="#">Forgot Password?</a>
                             </div>
                             <div class="my-auto col-auto">
-                                <button type="submit"
+                                <button ref="btnSignIn" type="submit"
                                     :disabled="isLoading"
                                     class="px-4 btn btn-primary rounded-pill muli-ex-bold animated fadeInLeft my-btn">
-                                    <span class="trantition">Sign In</span>
+                                    <span class="trantition" v-if="!isLoading">Sign In</span>
+                                    <span class="trantition" v-else>Please wait! </span>
                                     <i v-if="!isLoading" class="bi bi-arrow-right d-inline ms-2 font-13"></i>
                                     <div v-if="isLoading" class="spinner-border spinner-border-sm ms-2" role="status">
                                         <span class="visually-hidden">Loading...</span>
@@ -67,6 +68,7 @@
     import helpers from '@/global/helpers';
 
     /**  Define variables */
+    let btnSignIn = ref(false); 
     let showPass = ref(false); 
     let isLoading = ref(false); 
 
@@ -84,6 +86,9 @@
             .then(function successCallBack(response) {
                 var data = response.data;
                 if (data.success) {
+                    var btnElement = btnSignIn.value;
+                    btnElement.setAttribute('disabled', true);
+                    // btnElement.innerHTML = errors.value[fieldName];
                     var authorization = data.token;
                     var user = data.user;
                     var role = data.role;

@@ -60,7 +60,7 @@
 
 <script setup>
     /** Import package */
-    import { ref } from "vue";
+    import { ref, computed } from "vue";
     /** Import component */
     import MyInput from '@/components/atoms/MyInput.vue';
     import MySelect from '@/components/atoms/MySelect.vue';
@@ -127,7 +127,11 @@
 
     const emit = defineEmits(["update:modelValue"]);
 
-    const modelValue = ref(props.modelValue);
+    // const modelValue = ref(props.modelValue);
+    const modelValue = computed({
+        get: () => props.modelValue,
+        set: (value) => emit("update:modelValue", value),
+    });;
 
     const updateInput = (event) => {
         modelValue.value = event.target.value;

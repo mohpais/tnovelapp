@@ -120,7 +120,7 @@ export default [
                         meta: {
                             title: "User List",
                             breadcrumbs: [
-                                { name: `Home`, link: `` },
+                                { name: `Home`, link: `/panel/` },
                                 { name: "User", link: "/panel/users" },
                             ],
                         },
@@ -132,9 +132,9 @@ export default [
                         meta: {
                             title: "User Add",
                             breadcrumbs: [
-                                { name: `Home`, link: `` },
-                                { name: "User", link: "" },
-                                { name: "User", link: "/panel/users/add" },
+                                { name: `Home`, link: `/panel/` },
+                                { name: "User", link: "/panel/users" },
+                                { name: "Add", link: "/panel/users/add" },
                             ],
                         },
                     }

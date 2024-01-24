@@ -1,4 +1,5 @@
 import "./bootstrap";
+// import 'bootstrap/dist/js/bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "@/assets/vendors/bootstrap-icons/bootstrap-icons.css";
 import "@/assets/vendors/boxicons/css/boxicons.min.css";

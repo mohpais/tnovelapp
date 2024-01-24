@@ -183,6 +183,14 @@ html {
     }
 }
 
+.dataTable .dropdown-toggle:after {
+    display: none !important;
+    border: 0 !important;
+}
+
+.dataTable .dropdown-menu {
+    right: 20px;
+}
 
 * {
     scrollbar-width: thin;

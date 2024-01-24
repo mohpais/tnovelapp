@@ -136,8 +136,7 @@
         default: "",
       },
     });
-    import {Hindi} from 'flatpickr/dist/l10n/hi.js';
-
+    
     const config = ref({
         wrap: true, // set wrap to true only when using 'input-group'
         altFormat: 'M j, Y',
@@ -150,7 +149,11 @@
     const emit = defineEmits(["update:modelValue"]);
 
     const myinput = ref(null);
-    const modelValue = ref(props.modelValue);
+    // const modelValue = ref(props.modelValue);
+    const modelValue = computed({
+      get: () => props.modelValue,
+      set: (value) => emit("update:modelValue", value),
+    });;
 
     const updateInput = (event) => {
       modelValue.value = event.target.value;

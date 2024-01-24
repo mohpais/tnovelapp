@@ -1,5 +1,5 @@
 <script setup>
-    import { onMounted, ref } from "vue";
+    import { onMounted, computed, ref, getCurrentInstance } from "vue";
     import { Modal } from "bootstrap";
     defineProps({
         id: String,
@@ -8,6 +8,12 @@
             default: "<<Title goes here>>",
         },
     });
+
+    const hasFooter = computed(() => {
+        const instance = getCurrentInstance();
+        return instance.slots.footer !== undefined;
+    });
+
     let modalEle = ref(null);
     let thisModalObj = null;
 
@@ -19,22 +25,26 @@
         thisModalObj.show();
     }
 
-    defineExpose({ show: _show });
+    function _hide() {
+        thisModalObj.hide();
+    }
+
+    defineExpose({ show: _show, hide: _hide });
 </script>
 
 <template>
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby=""
+    <div class="modal fade" :id="id" tabindex="-1" aria-labelledby=""
         aria-hidden="true" ref="modalEle">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">{{ title }}</h5>
+                    <h5 class="modal-title" id="modalLabel">{{ title }}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <slot name="body" />
                 </div>
-                <div class="modal-footer">
+                <div v-if="hasFooter" class="modal-footer">
                     <slot name="footer"></slot>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                         Close
