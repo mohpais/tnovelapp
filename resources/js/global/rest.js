@@ -27,7 +27,6 @@ class Rest {
             !originalRequest._retry) ||
           error.message === "Network Error"
         ) {
-          debugger
           if (this.isRefreshing) {
             sessionStorage.removeItem("_xa");
             sessionStorage.removeItem("_us");

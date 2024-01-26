@@ -13,3 +13,11 @@ export const GetListDataTables = async (_url, payload) => {
         throw new Error(error);
     }
 };
+export const DeleteItemOnDataTables = async (_url) => {
+    try {
+        return await rest.post(_url);
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+};

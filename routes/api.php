@@ -30,8 +30,9 @@ Route::group([
     'prefix' => 'user'
 ], function ($router) {
     Route::get('/list', [UserController::class, 'index']);
-    Route::post('/create', [UserController::class, 'store']);
     Route::post('/list-datatables', [UserController::class, 'list']);  
+    Route::post('/create', [UserController::class, 'store'])->name('user.store');
+    Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('user.destroy');
 });
 
 Route::group([

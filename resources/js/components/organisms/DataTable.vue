@@ -49,12 +49,6 @@
                     <tbody>
                         <tr v-if="state.isLoading">
                             <td :colspan="hasActions || (options.hasOwnProperty('action') && options.action) ? options.columns.length + 1 : options.columns.length" class="text-center py-4">
-                                <div class="spinner-border text-secondary me-1" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                                <div class="spinner-border text-secondary me-1" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
                                 <div class="spinner-border text-secondary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -93,7 +87,7 @@
                                         <router-link class="dropdown-item" :to="{ path: route.path + `edit/${item.id}` }">
                                             <i class="bi bi-pencil-square me-1"></i>Edit
                                         </router-link>
-                                        <a class="dropdown-item" href="#"><i class="bi bi-trash me-1"></i>Delete</a>
+                                        <a type="button" @click="deleteItem(item)" class="dropdown-item"><i class="bi bi-trash me-1"></i>Delete</a>
                                         <a class="dropdown-item" href="#"><i class="bi bi-link me-1"></i>Detail</a>
                                         <!-- <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Separated link</a> -->
@@ -114,10 +108,6 @@
             </div>
         </div>
     </div>
-    <!-- <div class="col-sm-12 table-responsive" style="max-height: fit-content; height: 100%;">
-        
-        
-    </div> -->
 </template>
   
 <script setup>
@@ -125,11 +115,16 @@
     import { ref, computed, reactive, getCurrentInstance, watch, onMounted, onUpdated, nextTick } from "vue";
     import { useRoute } from 'vue-router';
     /** Import component */
-    import Pagination from '@/components/molekuls/Pagination.vue'; // Adjust the path accordingly
+    const Pagination = defineAsyncComponent(() =>
+        import("@/components/molekuls/Pagination.vue")
+    );
+    const DataTable = defineAsyncComponent(() =>
+        import("@/components/organisms/DataTable.vue")
+    );
     /** Import global */
     import helpers from '@/global/helpers';
     /** Import service */
-    import { GetListDataTables } from "@/services"; // Import from Global Packages GetListDataTables
+    import { GetListDataTables, DeleteItemOnDataTables } from "@/services"; // Import from Global Packages GetListDataTables
     /** Define props */
     const props = defineProps({
         options: {
@@ -250,6 +245,7 @@
             state.pagination = response.data.pagination;
         } catch (error) {
             console.error('Error fetching data:', error);
+            helpers.alertToast("error", "Something wrong when load item!");
             state.data = [];
         } finally {
             state.isLoading = false;
@@ -327,6 +323,22 @@
     const openModal = (item) => {
         // Default action logic
         return emits("openModal", item);
+    }
+
+    const deleteItem = async (item) => {
+        const isConfirmed = await helpers.confirmDeleteAction();
+        if (isConfirmed) {
+            try {
+                let url = route.path + `delete/${item.id}`;
+                const response = await DeleteItemOnDataTables(url);
+                var { success, message } = response.data;
+                if (success) {
+                    helpers.alertToast("success", message);
+                }
+            } catch (error) {
+                helpers.alertToast("error", "Something wrong when delete item!");
+            }
+        }
     }
 </script>
   
