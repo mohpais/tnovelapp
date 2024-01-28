@@ -5,8 +5,8 @@
                 <div class="card">
                     <div class="card-header border-bottom d-flex justify-content-between">
                         <div class="title">
-                            <h5 class="card-title">User List Table</h5>
-                            <h6 class="card-subtitle text-muted fz-13">The following is a list of users in the Hidayah app.</h6>
+                            <h5 class="card-title">User List</h5>
+                            <h6 class="card-subtitle text-muted fz-13">The following is a list of users in the TNovel App.</h6>
                         </div>
                         <div class="action my-auto">
                             <!-- <button class="btn btn-sm btn-success" @click="openModal()">
@@ -16,7 +16,7 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <data-table :options="state.dataTable" @openModal="openModal">
+                        <data-table :options="state.dataTable" @openModal="openModal" @deleteData="handleDelete">
                              <!-- Custom actions for each row -->
                              <!-- <template #actions="{ item }">
                                 <div class="dropdown">
@@ -64,6 +64,7 @@
     import { ref, reactive, defineAsyncComponent } from "vue";
     /** Import global */
     import helpers from '@/global/helpers';
+    import { DeleteItemOnDataTables } from "@/services"; // Import from Global Packages GetListDataTables
     /** Import Component */
     const DataTable = defineAsyncComponent(() =>
         import("@/components/organisms/DataTable.vue")
@@ -107,14 +108,14 @@
                 },
                 { text: 'Name', data: 'fullname', visible: false, searchable: true },
                 { data: 'username' },
-                { data: 'email', searchable: true, orderable: false },
+                { data: 'email', searchable: true },
                 { data: 'birthday', orderable: false },
                 { 
                     data: 'gender', 
                     orderable: false, 
                     render:  function ( data, type, row, meta ) {
                         // console.log(data, type, row, meta);
-                        return `<span class="badge bg-success p-1">${data}</span>`;
+                        return `<span class="badge bg-success">${data}</span>`;
                     },
                     // render: function ( data, type, row, meta ) {
                     //     return type === 'display' && data.length > 40 ?
@@ -123,12 +124,14 @@
                     // }
                 },
                 {
-                    data: 'status',
+                    data: 'status', 
+                    orderable: false,
                     render: function (data, type, row, meta) {
-                        let switchButton = `<div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="status-id-${row.id}" ${data ? 'checked' : ''}>
-                            </div>`
-                        let div = `<div class="d-flex justify-content-center">${switchButton}</div>`
+                        // let switchButton = `<div class="form-check form-switch">
+                        //     <input class="form-check-input" type="checkbox" id="status-id-${row.id}" ${data ? 'checked' : ''}>
+                        //     </div>`
+                        // let div = `<div class="d-flex justify-content-center">${switchButton}</div>`
+                        let div = `<span class="badge badge-${data ? 'success' : 'danger'}-light">${data ? 'Active' : 'Non Active'}</span>`
                         return div;
                     }
                 },
@@ -180,6 +183,23 @@
     const handleEdit = () => {
         console.log(editUserForm);
         // formProvider.value.onSubmit();
+    }
+
+    const handleDelete = async (item) => {
+        const isConfirmed = await helpers.confirmDeleteAction();
+        if (isConfirmed) {
+            try {
+                let url = `user/delete`;
+                let params = { id: item.id };
+                const response = await DeleteItemOnDataTables(url, params);
+                var { success, message } = response.data;
+                if (success) {
+                    helpers.alertToast("success", message);
+                }
+            } catch (error) {
+                helpers.alertToast("error", "Something wrong when delete item!");
+            }
+        }
     }
 
     const onSubmit = async (isValid) => {

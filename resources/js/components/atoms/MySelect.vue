@@ -35,7 +35,7 @@
       default: "-- Select an option --"
     },
     modelValue: {
-      type: [String, Number],
+      type: [String, Number, Array],
       required: false,
       default: "",
     },
@@ -52,11 +52,11 @@
 
   const myselect = ref(null);
   const modelValue = ref(props.modelValue);
-
-  const updateSelect = (event) => {
-    modelValue.value = event.target.value;
-    emit("update:modelValue", event.target.value);
-  };
+  
+  const updateSelect = computed({
+    get: () => props.modelValue,
+    set: (value) => emit("update:modelValue", value),
+  });
 
   const { validateRequired, errors } = useFormValidation();
 

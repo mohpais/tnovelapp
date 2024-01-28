@@ -76,7 +76,7 @@
 
                             </td>
                             <td v-if="hasActions || (options.hasOwnProperty('action') && options.action)" class="fixed-column-action bg-white">
-                                <div class="btn-group position-relative">
+                                <div class="btn-group position-relative dropdown">
                                     <button type="button" :id="`dropdown-menu-${row}`" class="btn btn-sm btn-link dropdown-toggle border" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                         <i class="bi bi-three-dots-vertical"></i>
                                     </button>
@@ -84,15 +84,17 @@
                                         class="dropdown-menu"  :aria-labelledby="`dropdown-menu-${row}`"
                                     >
                                         <!-- <a type="button" @click="openModal(item)" class="dropdown-item" href="#"><i class="bi bi-pencil-square me-1"></i>Edit</a> -->
-                                        <router-link class="dropdown-item" :to="{ path: route.path + `edit/${item.id}` }">
+                                        <router-link class="dropdown-item" :to="{ path: route.path + `/edit/${item.id}` }">
                                             <i class="bi bi-pencil-square me-1"></i>Edit
                                         </router-link>
-                                        <a type="button" @click="deleteItem(item)" class="dropdown-item"><i class="bi bi-trash me-1"></i>Delete</a>
+                                        <a type="button" @click="deleteData(item)" class="dropdown-item"><i class="bi bi-trash me-1"></i>Delete</a>
                                         <a class="dropdown-item" href="#"><i class="bi bi-link me-1"></i>Detail</a>
                                         <!-- <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" href="#">Separated link</a> -->
                                     </div>
                                 </div>
+                                <!-- <a type="button" @click="deleteItem(item)" class=""><i class="bi bi-trash me-1"></i>Delete</a> -->
+
                             </td>
                         </tr>
                     </tbody>
@@ -112,7 +114,7 @@
   
 <script setup>
     /** Import package */
-    import { ref, computed, reactive, getCurrentInstance, watch, onMounted, onUpdated, nextTick } from "vue";
+    import { ref, computed, reactive, getCurrentInstance, watch, onMounted, onUpdated, nextTick, defineAsyncComponent } from "vue";
     import { useRoute } from 'vue-router';
     /** Import component */
     const Pagination = defineAsyncComponent(() =>
@@ -120,6 +122,9 @@
     );
     const DataTable = defineAsyncComponent(() =>
         import("@/components/organisms/DataTable.vue")
+    );
+    const Modal = defineAsyncComponent(() =>
+        import("@/components/organisms/Modal.vue")
     );
     /** Import global */
     import helpers from '@/global/helpers';
@@ -137,9 +142,10 @@
         }
     });
     /** Define variable */
-    const route = useRoute();
+    let modalDelete = ref(null);
+    let route = useRoute();
     let dataTable = ref(null);
-    const hasActions = computed(() => {
+    let hasActions = computed(() => {
         const instance = getCurrentInstance();
         return instance.slots.actions !== undefined;
     });
@@ -318,19 +324,28 @@
         });
     });
 
-    const emits = defineEmits(["openModal"]);
+    const emits = defineEmits(["openModal", "deleteData"]);
 
     const openModal = (item) => {
         // Default action logic
         return emits("openModal", item);
     }
 
+    const deleteData = (item) => {
+        // Default action logic
+        return emits("deleteData", item);
+    }
+
     const deleteItem = async (item) => {
+        // if (item) {
+        //     modalDelete.value.show();
+        // }
         const isConfirmed = await helpers.confirmDeleteAction();
         if (isConfirmed) {
             try {
-                let url = route.path + `delete/${item.id}`;
-                const response = await DeleteItemOnDataTables(url);
+                let url = route.path + `delete`;
+                let params = {params: { id: item.id }};
+                const response = await DeleteItemOnDataTables(url, params);
                 var { success, message } = response.data;
                 if (success) {
                     helpers.alertToast("success", message);

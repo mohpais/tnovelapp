@@ -70,7 +70,7 @@
                             <hr />
                             <div class="row">
                                 <div class="col-auto">
-                                    <button class="btn btn-sm btn-success" type="submit" :disabled="state.isLoading">
+                                    <button ref="buttonSubmit" class="btn btn-sm btn-success" type="submit" :disabled="state.isLoading">
                                         <span v-if="!state.isLoading">Submit</span>
                                         <div v-if="state.isLoading" class="spinner-border spinner-border-sm" role="status">
                                             <span class="visually-hidden">Loading...</span>
@@ -116,6 +116,8 @@
         // Add other form fields as needed
     });
 
+    let buttonSubmit = ref(null)
+
     onMounted(async () => {
         await GetRoleList()
             .then(function successCallBack(response) {
@@ -143,7 +145,10 @@
                 .then(function successCallBack(response) {
                     var { success, message } = response.data;
                     helpers.alertToast(success ? 'success' : "error", message);
-                    router.push({ to: '/panel/users/' });
+                    if (success) {
+                        buttonSubmit.value.setAttribute('disabled', 'true');
+                        router.push('/panel/users/');
+                    }
                 })
                 .catch(function errorCallBack(error) {
                     console.log(error);

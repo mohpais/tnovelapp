@@ -10,6 +10,15 @@ export const GetUserList = async () => {
     }
 };
 
+export const GetUser = async (id) => {
+    try {
+        return await rest.get(`user/edit/` + id);
+    } catch (error) {
+        console.log(error);
+        throw new Error(error);
+    }
+};
+
 export const CreateUser = async (payload) => {
     try {
         return await rest.post(`user/create`, payload);

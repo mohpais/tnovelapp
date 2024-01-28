@@ -13,9 +13,9 @@ export const GetListDataTables = async (_url, payload) => {
         throw new Error(error);
     }
 };
-export const DeleteItemOnDataTables = async (_url) => {
+export const DeleteItemOnDataTables = async (_url, _payload) => {
     try {
-        return await rest.post(_url);
+        return await rest.post(_url, _payload);
     } catch (error) {
         console.log(error);
         throw new Error(error);

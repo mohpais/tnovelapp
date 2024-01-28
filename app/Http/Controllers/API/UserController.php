@@ -105,7 +105,14 @@ class UserController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    { }
+    { 
+        $user = User::where('id', $id)->with('roles')->first();
+
+        return response()->json([
+            'success' => true,
+            'data' => $user
+        ]);
+    }
 
     /**
      * Update the specified resource in storage.
@@ -116,15 +123,20 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        //get user by ID
-        $user = User::findOrFail($id);
-        $user->delete();
+        try 
+        {
+            // User::whereIn('id', $request->id)->delete(); // $request->id MUST be an array
+            User::findOrFail($request->id)->delete();
+            return response()->json([
+                'success' => true,
+                'message' => 'User deleted successfully'
+            ]);
+        }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'User deleted successfully'
-        ]);
+        catch (Exception $e) {
+            return response()->json($e->getMessage(), 500);
+        }
     }
 }

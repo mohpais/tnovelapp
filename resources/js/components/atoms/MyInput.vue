@@ -153,12 +153,16 @@
     const modelValue = computed({
       get: () => props.modelValue,
       set: (value) => emit("update:modelValue", value),
-    });;
+    });
 
-    const updateInput = (event) => {
-      modelValue.value = event.target.value;
-      emit("update:modelValue", event.target.value);
-    };
+    // const updateInput = (event) => {
+    //   modelValue.value = event.target.value;
+    //   emit("update:modelValue", event.target.value);
+    // };
+    const updateInput = computed({
+      get: () => props.modelValue,
+      set: (value) => emit("update:modelValue", value),
+    });
 
     const {
       validateRequired,

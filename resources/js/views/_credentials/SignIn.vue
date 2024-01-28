@@ -87,7 +87,7 @@
                 var data = response.data;
                 if (data.success) {
                     var btnElement = btnSignIn.value;
-                    btnElement.setAttribute('disabled', true);
+                    btnElement.setAttribute('disabled', 'true');
                     // btnElement.innerHTML = errors.value[fieldName];
                     var authorization = data.token;
                     var user = data.user;

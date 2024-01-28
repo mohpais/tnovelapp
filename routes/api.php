@@ -32,7 +32,9 @@ Route::group([
     Route::get('/list', [UserController::class, 'index']);
     Route::post('/list-datatables', [UserController::class, 'list']);  
     Route::post('/create', [UserController::class, 'store'])->name('user.store');
-    Route::delete('/delete/{id}', [UserController::class, 'destroy'])->name('user.destroy');
+    Route::get('/edit/{id}', [UserController::class, 'edit'])->name('user.edit');
+    Route::post('/update/{id}', [UserController::class, 'update'])->name('user.update');
+    Route::post('/delete', [UserController::class, 'destroy'])->name('user.destroy');
 });
 
 Route::group([
